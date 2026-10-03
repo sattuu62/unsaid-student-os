@@ -1,0 +1,1320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#07080c">
+<title>UNSAID // STUDENT_OS</title>
+<style>
+:root{
+  --bg:#07080c;
+  --panel:#10131a;
+  --panel-2:#0c0f14;
+  --line:#252b35;
+  --muted:#8b939f;
+  --text:#f3f5f7;
+  --accent:#b8ff3d;
+  --accent-dim:#789f29;
+  --danger:#ff657a;
+  --cyan:#75d8ff;
+  --shadow:0 18px 60px rgba(0,0,0,.28);
+  --radius:18px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;
+  line-height:1.5;
+}
+body:before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.055;
+  background-image:linear-gradient(rgba(255,255,255,.5) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(255,255,255,.5) 1px,transparent 1px);
+  background-size:42px 42px;
+  mask-image:linear-gradient(to bottom,black,transparent 80%);
+}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+.wrap{width:min(1180px,calc(100% - 32px));margin:0 auto;padding:22px 0 60px}
+.mono,.eyebrow,.status,.tag,.console,.boot-kicker,.stats-grid,.meta,.btn{
+  font-family:"SFMono-Regular",Consolas,"Liberation Mono",monospace;
+}
+.boot{
+  min-height:calc(100vh - 44px);display:grid;place-items:center;
+}
+.boot-shell{width:min(760px,100%);padding:34px}
+.boot-kicker{font-size:12px;color:var(--accent);letter-spacing:.16em;text-transform:uppercase}
+.boot-title{
+  margin:14px 0 6px;font-size:clamp(3.6rem,11vw,7.8rem);line-height:.82;
+  letter-spacing:-.08em;font-weight:900;
+}
+.boot-title span{color:var(--accent)}
+.boot-sub{color:var(--muted);margin:0 0 28px}
+.terminal-lines{
+  min-height:174px;padding:18px;border:1px solid var(--line);background:#05070a;
+  border-radius:12px;box-shadow:inset 0 0 40px rgba(0,0,0,.35);
+}
+.terminal-line{margin:0 0 9px;color:#b7bec8;font-size:14px}
+.terminal-line:before{content:"> ";color:var(--accent)}
+.progress{height:6px;background:#1a1e25;border-radius:99px;overflow:hidden;margin:22px 0 20px}
+.progress-bar{height:100%;width:0;background:var(--accent);transition:width .35s ease}
+.btn{
+  border:1px solid var(--accent);background:var(--accent);color:#071000;
+  padding:12px 16px;border-radius:10px;font-weight:800;letter-spacing:.02em;
+  transition:transform .15s ease,box-shadow .15s ease,background .15s ease;
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 25px rgba(184,255,61,.12)}
+.btn.secondary{background:transparent;color:var(--accent)}
+.btn.ghost{border-color:var(--line);background:#11151b;color:var(--text)}
+.btn:focus-visible,.choice:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.app{animation:appear .45s ease}
+@keyframes appear{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.topbar{
+  display:flex;justify-content:space-between;align-items:center;gap:16px;
+  padding:4px 0 22px;border-bottom:1px solid var(--line);margin-bottom:34px;
+}
+.logo{font-weight:900;letter-spacing:-.04em;font-size:18px}
+.logo i{font-style:normal;color:var(--accent)}
+.system-status{font:12px "SFMono-Regular",Consolas,monospace;color:var(--muted)}
+.system-status b{color:var(--accent);font-weight:700}
+
+.hero{padding:12px 0 56px;max-width:920px}
+.eyebrow{
+  display:inline-flex;border:1px solid var(--line);border-radius:99px;padding:6px 9px;
+  color:var(--accent);font-size:11px;letter-spacing:.1em;margin-bottom:18px;
+}
+.hero h1{font-size:clamp(3.4rem,9vw,7.8rem);line-height:.84;letter-spacing:-.085em;margin:0 0 24px;font-weight:950}
+.hero h1 span{display:block}
+.hero p{max-width:720px;color:#aeb5bf;font-size:clamp(1rem,2vw,1.18rem);margin:0}
+
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+.card{
+  grid-column:span 6;background:linear-gradient(145deg,var(--panel),#0d1016);
+  border:1px solid var(--line);border-radius:var(--radius);padding:22px;
+  box-shadow:var(--shadow);position:relative;overflow:hidden;
+}
+.card.wide{grid-column:span 8}
+.card.narrow{grid-column:span 4}
+.card.full{grid-column:1/-1}
+.card:after{
+  content:"";position:absolute;inset:auto -40px -70px auto;width:150px;height:150px;
+  border-radius:50%;background:rgba(184,255,61,.035);filter:blur(8px);pointer-events:none;
+}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:18px}
+.card-num{font:11px "SFMono-Regular",Consolas,monospace;color:#5f6874}
+h2{font-size:1.15rem;margin:0;letter-spacing:-.02em}
+.desc{color:var(--muted);font-size:.92rem;margin:6px 0 0}
+.choice-grid{display:flex;flex-wrap:wrap;gap:9px}
+.choice{
+  border:1px solid var(--line);background:#0b0e13;color:#dce1e7;padding:10px 12px;
+  border-radius:9px;font:700 11px "SFMono-Regular",Consolas,monospace;
+  transition:.15s ease;
+}
+.choice:hover,.choice.active{border-color:var(--accent);color:var(--accent);background:#11180b}
+.output{
+  margin-top:16px;padding:15px;border-left:2px solid var(--accent);
+  background:#0a0d11;color:#d9dee5;min-height:50px;white-space:pre-wrap;
+}
+.label{display:block;color:#77808d;font:10px "SFMono-Regular",Consolas,monospace;text-transform:uppercase;letter-spacing:.12em;margin:0 0 7px}
+textarea,input{
+  width:100%;border:1px solid var(--line);background:#090c10;color:var(--text);
+  border-radius:10px;padding:12px;resize:vertical;
+}
+textarea{min-height:112px}
+input{height:46px}
+.form-row{display:grid;grid-template-columns:1fr;gap:12px}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}
+.small{font-size:.8rem;color:var(--muted)}
+.stack{display:grid;gap:10px;margin-top:15px}
+.archive-item{
+  border:1px solid var(--line);background:#0a0d11;border-radius:11px;padding:13px;
+}
+.archive-top{display:flex;justify-content:space-between;gap:10px;margin-bottom:6px}
+.archive-to{color:var(--accent);font:700 11px "SFMono-Regular",Consolas,monospace}
+.archive-date{color:#626b77;font:10px "SFMono-Regular",Consolas,monospace}
+.archive-text{white-space:pre-wrap;color:#c9cfd7;font-size:.9rem}
+.empty{padding:16px;border:1px dashed #303640;border-radius:10px;color:#69727e;font-size:.85rem}
+.achievement{
+  margin-top:15px;border:1px solid #38422c;background:linear-gradient(145deg,#11170b,#0b0e0b);
+  border-radius:12px;padding:18px;
+}
+.achievement .badge{font-size:1.5rem;margin-bottom:7px}
+.achievement h3{margin:0 0 5px;font-size:1rem}
+.achievement p{margin:0;color:#aab29f;font-size:.9rem}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.stat{border:1px solid var(--line);background:#0a0d11;border-radius:11px;padding:14px}
+.stat b{display:block;font-size:1.6rem;color:var(--accent);line-height:1}
+.stat span{display:block;color:#707986;font-size:10px;text-transform:uppercase;letter-spacing:.08em;margin-top:7px}
+.console{
+  background:#05070a;border:1px solid var(--line);border-radius:12px;padding:14px;
+  min-height:190px;max-height:300px;overflow:auto;color:#8f98a4;font-size:12px;
+}
+.log{margin:0 0 7px}.log b{color:var(--accent);font-weight:500}.log .kind{color:#c6ccd5}
+.footer{
+  margin-top:26px;padding-top:18px;border-top:1px solid var(--line);
+  color:#555e69;font:10px "SFMono-Regular",Consolas,monospace;
+  display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;
+}
+@media(max-width:850px){
+  .card,.card.wide,.card.narrow{grid-column:1/-1}
+}
+@media(max-width:620px){
+  .wrap{width:min(100% - 20px,1180px);padding-top:12px}
+  .boot-shell{padding:20px 0}
+  .topbar{align-items:flex-start;flex-direction:column}
+  .hero{padding-bottom:40px}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .card{padding:17px}
+  .hero h1{font-size:clamp(3rem,18vw,5rem)}
+}
+
+/* ===== UNSAID v2 FULL CHAOS EDITION ===== */
+.section-label{
+  grid-column:1/-1;display:flex;align-items:center;gap:12px;
+  margin:24px 2px 2px;color:var(--accent);
+  font:700 11px "SFMono-Regular",Consolas,monospace;letter-spacing:.16em;
+  text-transform:uppercase;
+}
+.section-label:after{content:"";height:1px;background:var(--line);flex:1}
+.range-grid{display:grid;gap:13px}
+.range-row{display:grid;grid-template-columns:minmax(105px,1.1fr) 1.7fr 34px;gap:10px;align-items:center}
+.range-row label{font:11px "SFMono-Regular",Consolas,monospace;color:#cbd1d8}
+.range-row output{font:11px "SFMono-Regular",Consolas,monospace;color:var(--accent);text-align:right}
+input[type=range]{width:100%;height:5px;accent-color:var(--accent);padding:0;border:0;background:transparent}
+.snapshot-bars{display:grid;gap:9px;margin-top:16px}
+.snapshot-row{display:grid;grid-template-columns:125px 1fr 24px;gap:9px;align-items:center;font:10px "SFMono-Regular",Consolas,monospace}
+.bar-track{height:8px;background:#1a1e25;border-radius:99px;overflow:hidden}
+.bar-fill{height:100%;width:0;background:var(--accent);transition:width .5s ease}
+.egg-screen{
+  margin-top:14px;padding:16px;border:1px solid #3a4528;background:#080b07;
+  font-family:"SFMono-Regular",Consolas,monospace;color:var(--accent);
+  animation:terminalFlicker 2.4s ease-in-out 1;
+}
+.egg-screen strong{display:block;margin-bottom:8px}
+@keyframes terminalFlicker{0%,100%{opacity:1}8%{opacity:.2}12%{opacity:1}28%{opacity:.55}34%{opacity:1}}
+.unlock-pop{
+  position:fixed;right:18px;bottom:18px;z-index:20;width:min(370px,calc(100% - 36px));
+  background:#0b1008;border:1px solid var(--accent);border-radius:14px;padding:16px;
+  box-shadow:0 18px 55px rgba(0,0,0,.55);animation:unlockIn .4s ease;
+}
+.unlock-pop h3{margin:0 0 5px;color:var(--accent);font:800 13px "SFMono-Regular",Consolas,monospace}
+.unlock-pop p{margin:0;color:#b8c0b0;font-size:.86rem}
+@keyframes unlockIn{from{transform:translateY(18px);opacity:0}to{transform:none;opacity:1}}
+.achievement-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:15px}
+.achievement-item{border:1px solid var(--line);background:#0a0d11;border-radius:11px;padding:13px}
+.achievement-item.rare{border-color:#46562c;background:#0d1209}
+.achievement-item .a-icon{font-size:1.25rem}
+.achievement-item h4{margin:5px 0 4px;font-size:.88rem}
+.achievement-item p{margin:0;color:#7f8995;font-size:.78rem}
+.achievement-item .a-meta{margin-top:8px;color:var(--accent);font:9px "SFMono-Regular",Consolas,monospace}
+.time-options{display:flex;flex-wrap:wrap;gap:8px}
+.time-option{position:relative}
+.time-option input{position:absolute;opacity:0;pointer-events:none}
+.time-option span{
+  display:block;padding:9px 11px;border:1px solid var(--line);border-radius:9px;
+  background:#0b0e13;color:#cfd5dc;font:700 10px "SFMono-Regular",Consolas,monospace;cursor:pointer
+}
+.time-option input:checked + span{border-color:var(--accent);color:var(--accent);background:#11180b}
+.message-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.locked{border-left-color:#555f6c}
+.unlocked{border-left-color:var(--accent)}
+.trend-list{display:grid;gap:9px;margin-top:15px}
+.trend-row{display:grid;grid-template-columns:105px 1fr 24px;gap:9px;align-items:center;font:10px "SFMono-Regular",Consolas,monospace}
+.avg-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:16px}
+.avg{border:1px solid var(--line);border-radius:10px;padding:10px;background:#0a0d11}
+.avg b{display:block;color:var(--accent);font-size:1.1rem}
+.avg span{display:block;color:#69727e;font-size:9px;margin-top:4px}
+.danger{border-color:#54303a!important;color:#ff8b99!important}
+.danger:hover{box-shadow:0 10px 25px rgba(255,101,122,.08)!important}
+.rabbithole-chain{display:grid;gap:8px;margin-top:15px}
+.rabbit-node{
+  border:1px solid var(--line);background:#0a0d11;border-radius:10px;padding:11px 13px;
+  color:#cbd1d8;font-size:.9rem;animation:nodeIn .3s ease both
+}
+.rabbit-node:last-child{border-color:#43522b;color:var(--accent)}
+.rabbit-arrow{text-align:center;color:#59626e;font-family:monospace;font-size:11px}
+@keyframes nodeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+@media(max-width:620px){
+  .achievement-list{grid-template-columns:1fr}
+  .avg-grid{grid-template-columns:repeat(2,1fr)}
+  .range-row{grid-template-columns:100px 1fr 26px}
+  .snapshot-row,.trend-row{grid-template-columns:100px 1fr 22px}
+}
+
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<section id="bootScreen" class="boot" aria-label="UNSAID boot screen">
+  <div class="boot-shell">
+    <div class="boot-kicker">UNSAID // PRIVATE STUDENT SYSTEM</div>
+    <h1 class="boot-title">STUDENT<span>_OS</span></h1>
+    <p class="boot-sub">YOUR BRAIN. UNFILTERED.</p>
+    <div id="terminalLines" class="terminal-lines" aria-live="polite"></div>
+    <div class="progress" aria-label="Boot progress"><div id="progressBar" class="progress-bar"></div></div>
+    <button id="enterBtn" class="btn hidden">ENTER STUDENT_OS →</button>
+  </div>
+</section>
+
+<main id="appScreen" class="app hidden">
+  <header class="topbar">
+    <div class="logo">UNSAID<span>_</span>OS</div>
+    <div class="system-status">SYSTEM: <b>ONLINE</b> // mood: <b id="mood">undefined</b></div>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">NOT A PRODUCTIVITY APP</div>
+    <h1><span>YOUR BRAIN.</span><span>UNFILTERED.</span></h1>
+    <p>A chaotic little student operating system for the thoughts, pressure, expectations, future panic and things nobody actually says out loud.</p>
+  </section>
+
+  <section class="grid">
+
+    <article class="card wide">
+      <div class="card-head">
+        <div><h2>01 / Decode My Brain</h2><p class="desc">Pick what is currently running in the background.</p></div>
+        <span class="card-num">MOOD_ENGINE</span>
+      </div>
+      <div id="brainChoices" class="choice-grid">
+        <button class="choice" data-key="overthinking">OVERTHINKING</button>
+        <button class="choice" data-key="burnout">BURNOUT</button>
+        <button class="choice" data-key="comparison">COMPARISON</button>
+        <button class="choice" data-key="future">FUTURE PANIC</button>
+        <button class="choice" data-key="fine">I'M FINE™</button>
+      </div>
+      <div id="brainOutput" class="output">Awaiting diagnostic input...</div>
+    </article>
+
+    <article class="card narrow">
+      <div class="card-head">
+        <div><h2>02 / PARENT.EXE</h2><p class="desc">Because “what will people say?” is apparently a system process.</p></div>
+      </div>
+      <button id="parentBtn" class="btn secondary">RUN PARENT.EXE</button>
+      <div id="parentOutput" class="output hidden"></div>
+    </article>
+
+    <article class="card narrow">
+      <div class="card-head">
+        <div><h2>03 / FUTURE_404</h2><p class="desc">When everyone asks what you want to become before you know what you want to eat.</p></div>
+      </div>
+      <button id="futureBtn" class="btn secondary">SCAN FUTURE</button>
+      <div id="futureOutput" class="output hidden"></div>
+    </article>
+
+    <article class="card wide">
+      <div class="card-head">
+        <div><h2>04 / OVERTHINKING.INFINITE</h2><p class="desc">Drop a thought. Watch the loop expose itself.</p></div>
+        <span class="card-num">LOOP_DETECTOR</span>
+      </div>
+      <label class="label" for="loopThought">INPUT THOUGHT</label>
+      <textarea id="loopThought" placeholder='e.g. "Why did I say that?"'></textarea>
+      <div class="actions"><button id="loopBtn" class="btn">START LOOP</button></div>
+      <div id="loopOutput" class="output hidden"></div>
+    </article>
+
+    <article class="card narrow">
+      <div class="card-head">
+        <div><h2>05 / COMPARISON_LOOP</h2><p class="desc">Everyone's highlight reel vs. your behind-the-scenes.</p></div>
+      </div>
+      <button id="compareBtn" class="btn secondary">BREAK LOOP</button>
+      <div id="compareOutput" class="output hidden"></div>
+    </article>
+
+    <article class="card wide">
+      <div class="card-head">
+        <div><h2>06 / BURNOUT.SYS</h2><p class="desc">Check what your brain is actually asking for.</p></div>
+        <span class="card-num">RESOURCE_MONITOR</span>
+      </div>
+      <div class="choice-grid">
+        <button class="choice burnout-choice" data-state="tired">TIRED</button>
+        <button class="choice burnout-choice" data-state="drained">DRAINED</button>
+        <button class="choice burnout-choice" data-state="empty">EMPTY</button>
+        <button class="choice burnout-choice" data-state="focus">CAN'T FOCUS</button>
+      </div>
+      <div id="burnoutOutput" class="output">Awaiting system check...</div>
+    </article>
+
+    <article class="card narrow">
+      <div class="card-head">
+        <div><h2>07 / LETTERS NEVER SENT</h2><p class="desc">Say the thing without sending it. Saved only in this browser.</p></div>
+      </div>
+      <div class="form-row">
+        <div>
+          <label class="label" for="letterTo">TO</label>
+          <input id="letterTo" placeholder="person / future me / nobody" maxlength="80">
+        </div>
+        <div>
+          <label class="label" for="letterText">MESSAGE</label>
+          <textarea id="letterText" placeholder="Write what you never said..."></textarea>
+        </div>
+      </div>
+      <div class="actions"><button id="letterBtn" class="btn">ARCHIVE LETTER</button></div>
+      <div id="letterArchive" class="stack"></div>
+    </article>
+
+    <article class="card narrow">
+      <div class="card-head">
+        <div><h2>08 / SIGNAL ARCHIVE</h2><p class="desc">Small things that prove you made it through another day.</p></div>
+      </div>
+      <label class="label" for="signalText">SIGNAL</label>
+      <textarea id="signalText" placeholder="Today I..."></textarea>
+      <div class="actions"><button id="signalBtn" class="btn">SAVE SIGNAL</button></div>
+      <div id="signalArchive" class="stack"></div>
+    </article>
+
+
+    <div class="section-label">MIND</div>
+
+    <article class="card full">
+      <div class="card-head">
+        <div><h2>01B / BRAIN MAP</h2><p class="desc">What's actually taking up space in your head?</p></div>
+        <span class="card-num">SELF_REFLECTION</span>
+      </div>
+      <div id="brainMapControls" class="range-grid"></div>
+      <div class="actions">
+        <button id="brainMapGenerate" class="btn">GENERATE MY MAP</button>
+        <button id="brainMapReset" class="btn ghost">RESET MAP</button>
+      </div>
+      <div id="brainMapOutput" class="output hidden"></div>
+    </article>
+
+    <div class="section-label">CHAOS</div>
+
+    <article class="card wide">
+      <div class="card-head">
+        <div><h2>02B / RABBIT_HOLE.exe</h2><p class="desc">Start with one thought. See how far your brain can take it.</p></div>
+        <span class="card-num">CHAOS_NAV</span>
+      </div>
+      <label class="label" for="rabbitInput">WHAT ARE YOU THINKING ABOUT?</label>
+      <input id="rabbitInput" placeholder="e.g. I should study">
+      <div class="actions">
+        <button id="rabbitBtn" class="btn">GO DEEPER →</button>
+        <button id="rabbitReset" class="btn ghost">RESET RABBIT HOLE</button>
+      </div>
+      <div id="rabbitOutput" class="rabbithole-chain"></div>
+    </article>
+
+    <div class="section-label">REFLECTION</div>
+
+    <article class="card wide">
+      <div class="card-head">
+        <div><h2>03B / FUTURE_ME</h2><p class="desc">Leave something here for the version of you who hasn't arrived yet.</p></div>
+        <span class="card-num">LOCAL_TIME_CAPSULE</span>
+      </div>
+      <label class="label" for="futureMessage">MESSAGE TO FUTURE SELF</label>
+      <textarea id="futureMessage" placeholder="Write something to your future self..."></textarea>
+      <div class="time-options" id="futureTimeOptions">
+        <label class="time-option"><input type="radio" name="futureTime" value="7"><span>7 DAYS</span></label>
+        <label class="time-option"><input type="radio" name="futureTime" value="30"><span>30 DAYS</span></label>
+        <label class="time-option"><input type="radio" name="futureTime" value="182"><span>6 MONTHS</span></label>
+        <label class="time-option"><input type="radio" name="futureTime" value="365"><span>1 YEAR</span></label>
+      </div>
+      <div class="actions"><button id="futureSealBtn" class="btn">SEAL MESSAGE</button></div>
+      <div id="futureArchive" class="stack"></div>
+    </article>
+
+    <article class="card wide">
+      <div class="card-head">
+        <div><h2>04B / MOOD_EXPERIMENT</h2><p class="desc">Not a diagnosis. Just data.</p></div>
+        <span class="card-num">PERSONAL_REFLECTION</span>
+      </div>
+      <div id="moodControls" class="range-grid"></div>
+      <label class="label" for="goodThing">ONE GOOD THING TODAY</label>
+      <input id="goodThing" placeholder="Something small counts.">
+      <div class="actions">
+        <button id="moodLogBtn" class="btn">LOG TODAY</button>
+        <button id="moodClearBtn" class="btn ghost danger">CLEAR EXPERIMENT DATA</button>
+      </div>
+      <div id="moodTodayStatus" class="small" style="margin-top:10px"></div>
+      <div id="moodTrend" class="trend-list"></div>
+      <div id="moodAverages" class="avg-grid"></div>
+    </article>
+
+    <div class="section-label">SYSTEM</div>
+
+    <article class="card full">
+      <div class="card-head">
+        <div><h2>09B / ACHIEVEMENT ARCHIVE</h2><p class="desc">The systems you accidentally mastered.</p></div>
+        <span class="card-num">UNLOCKED_ONLY</span>
+      </div>
+      <div id="achievementArchive" class="achievement-list"></div>
+    </article>
+
+    <article class="card wide">
+      <div class="card-head">
+        <div><h2>09 / ACHIEVEMENT GENERATOR</h2><p class="desc">Turn ordinary survival into a fictional achievement badge.</p></div>
+        <span class="card-num">RANDOM_EVENT</span>
+      </div>
+      <button id="achievementBtn" class="btn">GENERATE ACHIEVEMENT</button>
+      <div id="achievementOutput" class="achievement hidden"></div>
+    </article>
+
+    <article class="card full">
+      <div class="card-head">
+        <div><h2>10 / STUDENT STATS</h2><p class="desc">Local telemetry. Nothing leaves this browser.</p></div>
+        <span class="card-num">LOCAL_STORAGE</span>
+      </div>
+      <div class="stats-grid">
+        <div class="stat"><b id="systemsStat">0</b><span>Systems Run</span></div>
+        <div class="stat"><b id="lettersStat">0</b><span>Letters Archived</span></div>
+        <div class="stat"><b id="signalsStat">0</b><span>Signals Saved</span></div>
+        <div class="stat"><b id="achievementsStat">0</b><span>Achievements</span></div>
+        <div class="stat"><b id="brainMapsStat">0</b><span>Brain Maps</span></div>
+        <div class="stat"><b id="rabbitHolesStat">0</b><span>Rabbit Holes</span></div>
+        <div class="stat"><b id="futureMessagesStat">0</b><span>Future Messages</span></div>
+        <div class="stat"><b id="moodEntriesStat">0</b><span>Mood Entries</span></div>
+        <div class="stat"><b id="easterEggsStat">0</b><span>Easter Eggs Found</span></div>
+      </div>
+    </article>
+
+    <article class="card full">
+      <div class="card-head">
+        <div><h2>11 / THE CHAOS CONSOLE</h2><p class="desc">Every useful little system event gets logged here.</p></div>
+        <span class="card-num">LIVE_LOG</span>
+      </div>
+      <div id="console" class="console" aria-live="polite"></div>
+    </article>
+  </section>
+
+  <footer class="footer">
+    <span>UNSAID // STUDENT_OS</span>
+    <span>LOCAL ONLY // NO CLOUD // NO PERFECT STUDENTS DETECTED</span>
+  </footer>
+</main>
+</div>
+
+<script>
+"use strict";
+
+const STORAGE = {
+  letters: "unsaid_letters_v1",
+  signals: "unsaid_signals_v1",
+  stats: "unsaid_stats_v1"
+};
+
+const bootLines = [
+  "loading unfinished thoughts...",
+  "mounting academic pressure...",
+  "detecting 47 open brain tabs...",
+  "ignoring the notification from Future You...",
+  "chaos level: acceptable."
+];
+
+const decodeResponses = {
+  overthinking: {
+    mood: "overclocked",
+    text: "Your brain has opened a meeting about a meeting about a thing that happened three days ago. Nothing needs to be solved right this second."
+  },
+  burnout: {
+    mood: "low battery",
+    text: "Low battery is not a personality flaw. Your brain may need recovery, not another motivational speech."
+  },
+  comparison: {
+    mood: "data incomplete",
+    text: "You are comparing your behind-the-scenes to someone else's selected scenes. The data is incomplete."
+  },
+  future: {
+    mood: "buffering",
+    text: "You do not need to have your entire life downloaded before finishing school. One next step is still a direction."
+  },
+  fine: {
+    mood: "complicated",
+    text: "SYSTEM NOTE: 'I'm fine' detected. Fine is allowed to be complicated."
+  }
+};
+
+const burnoutResponses = {
+  tired: "Your system is asking for a recharge.",
+  drained: "You sound seriously drained. Recovery is part of doing things well.",
+  empty: "This sounds heavier than ordinary tiredness. Tell someone you trust how you're feeling.",
+  focus: "Your focus system is overloaded. Reduce the next task to one tiny step."
+};
+
+const futureResponses = [
+  "404: perfect five-year plan not found. This is normal.",
+  "FUTURE SERVER RESPONSE: unavailable. Try asking what you want to explore next.",
+  "ERROR 404 — career certainty missing. Curiosity module still online.",
+  "Future API timed out. Meanwhile, today is still editable."
+];
+
+const achievementPool = [
+  ["🏆", "ACADEMIC SURVIVOR", "Opened the textbook while your brain was actively requesting a vacation."],
+  ["🏆", "CHAOS MANAGER", "Had seventeen thoughts and somehow completed one task."],
+  ["🏆", "EMOTIONAL DEBUGGER", "Noticed what you were feeling instead of pretending the system had no errors."],
+  ["🏆", "ONE MORE TRY", "Restarted after a bad day instead of declaring the entire week cancelled."],
+  ["🏆", "MAIN CHARACTER IN PROGRESS", "Still figuring it out. Still moving."],
+  ["🏆", "LOW BATTERY LEGEND", "Functioned on 12% and absolutely nobody knows how."]
+];
+
+let state = {
+  stats: { systems: 0, letters: 0, signals: 0, achievements: 0 },
+  letters: [],
+  signals: []
+};
+
+function safeParse(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch (e) {
+    return fallback;
+  }
+}
+
+function loadState() {
+  const stats = safeParse(STORAGE.stats, {});
+  const letters = safeParse(STORAGE.letters, []);
+  const signals = safeParse(STORAGE.signals, []);
+
+  state.stats = {
+    systems: Number.isFinite(stats.systems) ? stats.systems : 0,
+    letters: Number.isFinite(stats.letters) ? stats.letters : 0,
+    signals: Number.isFinite(stats.signals) ? stats.signals : 0,
+    achievements: Number.isFinite(stats.achievements) ? stats.achievements : 0
+  };
+  state.letters = Array.isArray(letters) ? letters : [];
+  state.signals = Array.isArray(signals) ? signals : [];
+}
+
+function persist(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch (e) {
+    logEvent("STORAGE WARNING: browser storage unavailable.");
+  }
+}
+
+function escapeHTML(value) {
+  return String(value ?? "").replace(/[&<>"']/g, function(char) {
+    return ({
+      "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#039;"
+    })[char];
+  });
+}
+
+function timeStamp() {
+  return new Intl.DateTimeFormat(undefined, {
+    hour: "2-digit", minute: "2-digit", hour12: true
+  }).format(new Date());
+}
+
+function logEvent(message, kind = "INFO") {
+  const consoleEl = document.getElementById("console");
+  if (!consoleEl) return;
+  const row = document.createElement("p");
+  row.className = "log";
+  row.innerHTML = '<b>[' + escapeHTML(timeStamp()) + ']</b> <span class="kind">' +
+    escapeHTML(kind) + "</span> " + escapeHTML(message);
+  consoleEl.appendChild(row);
+  while (consoleEl.children.length > 80) consoleEl.removeChild(consoleEl.firstChild);
+  consoleEl.scrollTop = consoleEl.scrollHeight;
+}
+
+function incrementSystems(label) {
+  state.stats.systems += 1;
+  persist(STORAGE.stats, state.stats);
+  updateStats();
+  logEvent(label + " executed.", "RUN");
+}
+
+function updateStats() {
+  document.getElementById("systemsStat").textContent = state.stats.systems;
+  document.getElementById("lettersStat").textContent = state.stats.letters;
+  document.getElementById("signalsStat").textContent = state.stats.signals;
+  document.getElementById("achievementsStat").textContent = state.stats.achievements;
+}
+
+function setMood(mood) {
+  document.getElementById("mood").textContent = mood;
+}
+
+function boot() {
+  const terminal = document.getElementById("terminalLines");
+  const progress = document.getElementById("progressBar");
+  let i = 0;
+
+  function next() {
+    if (i < bootLines.length) {
+      const p = document.createElement("p");
+      p.className = "terminal-line";
+      p.textContent = bootLines[i];
+      terminal.appendChild(p);
+      i += 1;
+      progress.style.width = Math.round((i / bootLines.length) * 100) + "%";
+      setTimeout(next, 430);
+    } else {
+      const ready = document.createElement("p");
+      ready.className = "terminal-line";
+      ready.textContent = "SYSTEM READY // waiting for human input.";
+      terminal.appendChild(ready);
+      document.getElementById("enterBtn").classList.remove("hidden");
+    }
+  }
+  next();
+}
+
+function enterOS() {
+  document.getElementById("bootScreen").classList.add("hidden");
+  document.getElementById("appScreen").classList.remove("hidden");
+  loadState();
+  updateStats();
+  renderLetters();
+  renderSignals();
+  logEvent("UNSAID online.");
+  logEvent("No perfect student detected.");
+  logEvent("This is probably a good thing.");
+}
+
+function renderLetters() {
+  const el = document.getElementById("letterArchive");
+  if (!state.letters.length) {
+    el.innerHTML = '<div class="empty">No archived letters. The outbox is suspiciously empty.</div>';
+    return;
+  }
+  el.innerHTML = state.letters.slice().reverse().map(function(item) {
+    return '<div class="archive-item">' +
+      '<div class="archive-top"><span class="archive-to">TO: ' + escapeHTML(item.to || "nobody") +
+      '</span><span class="archive-date">' + escapeHTML(item.date) + '</span></div>' +
+      '<div class="archive-text">' + escapeHTML(item.text) + '</div></div>';
+  }).join("");
+}
+
+function renderSignals() {
+  const el = document.getElementById("signalArchive");
+  if (!state.signals.length) {
+    el.innerHTML = '<div class="empty">No signals yet. Tiny wins are currently unlogged.</div>';
+    return;
+  }
+  el.innerHTML = state.signals.slice().reverse().map(function(item) {
+    return '<div class="archive-item">' +
+      '<div class="archive-top"><span class="archive-to">SIGNAL</span><span class="archive-date">' +
+      escapeHTML(item.date) + '</span></div><div class="archive-text">' +
+      escapeHTML(item.text) + "</div></div>";
+  }).join("");
+}
+
+
+/* ===== ACHIEVEMENT SYSTEM 2.0 ===== */
+const V2_STORAGE = {
+  brainMap: "unsaid_brain_map_v2",
+  rabbit: "unsaid_rabbit_v2",
+  future: "unsaid_future_messages_v2",
+  mood: "unsaid_mood_experiment_v2",
+  achievements: "unsaid_achievements_v2",
+  eggs: "unsaid_easter_eggs_v2"
+};
+
+const brainCategories = [
+  ["academics","ACADEMICS"],["future","FUTURE"],["family","FAMILY EXPECTATIONS"],
+  ["social","FRIENDS / SOCIAL"],["self","SELF"],["creativity","CREATIVITY"],
+  ["rest","REST"],["uncertainty","UNCERTAINTY"]
+];
+
+const moodMetrics = [
+  ["energy","ENERGY"],["focus","FOCUS"],["sleep","SLEEP"],
+  ["social","SOCIAL"],["studyLoad","STUDY LOAD"]
+];
+
+const achievementDefinitions = [
+  ["academic","🏆","ACADEMIC SURVIVOR","Opened the textbook while your brain was actively requesting a vacation.","common"],
+  ["chaos","🏆","CHAOS MANAGER","Had seventeen thoughts and somehow completed one task.","common"],
+  ["debugger","🏆","EMOTIONAL DEBUGGER","Noticed what you were feeling instead of pretending the system had no errors.","common"],
+  ["try","🏆","ONE MORE TRY","Restarted after a bad day instead of declaring the entire week cancelled.","common"],
+  ["main","🏆","MAIN CHARACTER IN PROGRESS","Still figuring it out. Still moving.","common"],
+  ["battery","🏆","LOW BATTERY LEGEND","Functioned on 12% and absolutely nobody knows how.","common"],
+  ["philosopher","🕳️","THE 2AM PHILOSOPHER","Triggered after enough Rabbit Hole interactions.","rare"],
+  ["cartographer","🧠","BRAIN CARTOGRAPHER","Generated a Brain Map.","rare"],
+  ["capsule","🔐","TIME CAPSULE","Sealed a Future Me message.","rare"],
+  ["data","📊","DATA GREMLIN","Logged multiple Mood Experiment entries.","rare"],
+  ["scientist","🧪","SCIENTIST MODE","Used the Mood Experiment several times.","rare"],
+  ["explorer","🌌","SYSTEM EXPLORER","Used multiple different UNSAID systems.","rare"],
+  ["egg","🥚","YOU FOUND IT","Triggered a hidden Easter egg.","rare"]
+];
+
+let v2 = {
+  brainMap: safeParse(V2_STORAGE.brainMap, {}),
+  rabbit: safeParse(V2_STORAGE.rabbit, {depth:0, seed:""}),
+  future: Array.isArray(safeParse(V2_STORAGE.future, [])) ? safeParse(V2_STORAGE.future, []) : [],
+  mood: Array.isArray(safeParse(V2_STORAGE.mood, [])) ? safeParse(V2_STORAGE.mood, []) : [],
+  achievements: Array.isArray(safeParse(V2_STORAGE.achievements, [])) ? safeParse(V2_STORAGE.achievements, []) : [],
+  eggs: Array.isArray(safeParse(V2_STORAGE.eggs, [])) ? safeParse(V2_STORAGE.eggs, []) : []
+};
+
+state.stats.brainMaps = Number(state.stats.brainMaps || 0);
+state.stats.rabbitHoles = Number(state.stats.rabbitHoles || 0);
+state.stats.futureMessages = Number(state.stats.futureMessages || 0);
+state.stats.moodEntries = Number(state.stats.moodEntries || 0);
+state.stats.easterEggs = Number(state.stats.easterEggs || 0);
+
+function persistV2(key, value) { persist(key, value); }
+
+function createRangeControl(containerId, items, prefix) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = items.map(function(item) {
+    return '<div class="range-row">' +
+      '<label for="' + prefix + item[0] + '">' + escapeHTML(item[1]) + '</label>' +
+      '<input id="' + prefix + item[0] + '" type="range" min="1" max="10" value="5">' +
+      '<output id="' + prefix + item[0] + 'Out">5</output></div>';
+  }).join("");
+  items.forEach(function(item) {
+    const input = document.getElementById(prefix + item[0]);
+    const output = document.getElementById(prefix + item[0] + "Out");
+    input.addEventListener("input", function(){ output.value = input.value; output.textContent = input.value; });
+  });
+}
+
+function getRangeValues(items, prefix) {
+  const result = {};
+  items.forEach(function(item) {
+    result[item[0]] = Number(document.getElementById(prefix + item[0]).value);
+  });
+  return result;
+}
+
+function setRangeValues(items, prefix, values) {
+  items.forEach(function(item) {
+    const input = document.getElementById(prefix + item[0]);
+    const output = document.getElementById(prefix + item[0] + "Out");
+    const value = Math.min(10, Math.max(1, Number(values[item[0]]) || 5));
+    input.value = value;
+    output.value = value;
+    output.textContent = value;
+  });
+}
+
+function barString(value) {
+  return "█".repeat(value) + "░".repeat(10 - value);
+}
+
+function brainMapSummary(values) {
+  const sorted = brainCategories.slice().sort(function(a,b){return values[b[0]] - values[a[0]];});
+  const high = sorted[0], second = sorted[1], low = sorted[sorted.length - 1];
+  return "Your current snapshot is most occupied by " + high[1].toLowerCase() +
+    (second ? " + " + second[1].toLowerCase() : "") +
+    ", while " + low[1].toLowerCase() + " is relatively low. This is a snapshot, not a diagnosis.";
+}
+
+function renderBrainMap(values) {
+  const output = document.getElementById("brainMapOutput");
+  output.classList.remove("hidden");
+  output.innerHTML =
+    '<strong>YOUR BRAIN RIGHT NOW</strong><div class="snapshot-bars">' +
+    brainCategories.map(function(item) {
+      const value = values[item[0]];
+      return '<div class="snapshot-row"><span>' + escapeHTML(item[1]) + '</span><span class="bar-track"><span class="bar-fill" style="width:' + (value*10) + '%"></span></span><span>' + value + '</span></div>';
+    }).join("") +
+    '</div><p style="margin:15px 0 0;color:#aeb5bf">' + escapeHTML(brainMapSummary(values)) + '</p>';
+}
+
+function generateBrainMap() {
+  const values = getRangeValues(brainCategories, "brain_");
+  v2.brainMap = values;
+  persistV2(V2_STORAGE.brainMap, values);
+  state.stats.brainMaps += 1;
+  persist(STORAGE.stats, state.stats);
+  updateStats();
+  renderBrainMap(values);
+  setMood("mapped");
+  incrementSystems("BRAIN MAP generated");
+  unlockAchievement("cartographer");
+}
+
+function resetBrainMap() {
+  const defaults = {};
+  brainCategories.forEach(function(item){defaults[item[0]]=5;});
+  setRangeValues(brainCategories, "brain_", defaults);
+  document.getElementById("brainMapOutput").classList.add("hidden");
+  v2.brainMap = {};
+  persistV2(V2_STORAGE.brainMap, {});
+  logEvent("BRAIN MAP reset.");
+}
+
+const rabbitPaths = [
+  ["I should study.","But I'm tired.","Why am I tired?","What did I do today?","Why did I open my phone?","Why do phones exist?","Technology.","Civilization.","Dinosaurs.","HOW DID WE GET HERE?"],
+  ["I need to finish this.","How long will it take?","What if I do it badly?","What does badly even mean?","Why do I care so much?","Expectations.","Society.","History.","Ancient civilizations.","HOW DID WE GET HERE?"],
+  ["I should sleep.","But I have things to do.","Which things matter first?","Why did I make this list?","Why do lists make more lists?","Organization.","Systems.","Computers.","Artificial intelligence.","HOW DID WE GET HERE?"],
+  ["I want to know what happens next.","Can anyone actually know?","Predictions.","Probability.","Time.","Space.","Stars.","The universe.","Existential tabs opened.","HOW DID WE GET HERE?"]
+];
+
+function renderRabbit() {
+  const el = document.getElementById("rabbitOutput");
+  const path = rabbitPaths[v2.rabbit.pathIndex || 0];
+  const depth = Math.min(v2.rabbit.depth || 0, path.length - 1);
+  const seed = v2.rabbit.seed || "I should study.";
+  const shown = [seed];
+  for (let i=1;i<=depth;i++) shown.push(path[i]);
+  el.innerHTML = shown.map(function(node,i) {
+    return (i ? '<div class="rabbit-arrow">↓</div>' : "") +
+      '<div class="rabbit-node">' + escapeHTML(node) + '</div>';
+  }).join("");
+}
+
+function rabbitDeepen() {
+  if (!v2.rabbit.seed) v2.rabbit.seed = document.getElementById("rabbitInput").value.trim() || "I should study.";
+  if (v2.rabbit.depth === 0) {
+    v2.rabbit.pathIndex = Math.floor(Math.random()*rabbitPaths.length);
+  }
+  v2.rabbit.depth += 1;
+  state.stats.rabbitHoles += 1;
+  persistV2(V2_STORAGE.rabbit, v2.rabbit);
+  persist(STORAGE.stats, state.stats);
+  updateStats();
+  renderRabbit();
+  setMood("down the rabbit hole");
+  incrementSystems("Rabbit Hole expanded");
+  if (v2.rabbit.depth >= 5) unlockAchievement("philosopher");
+}
+
+function resetRabbit() {
+  v2.rabbit = {depth:0,seed:"",pathIndex:0};
+  persistV2(V2_STORAGE.rabbit, v2.rabbit);
+  document.getElementById("rabbitInput").value = "";
+  document.getElementById("rabbitOutput").innerHTML = "";
+  logEvent("Rabbit Hole reset.");
+}
+
+function futureTimeframeLabel(days) {
+  return days == 7 ? "7 DAYS" : days == 30 ? "30 DAYS" : days == 182 ? "6 MONTHS" : "1 YEAR";
+}
+
+function renderFutureMessages() {
+  const el = document.getElementById("futureArchive");
+  if (!v2.future.length) {
+    el.innerHTML = '<div class="empty">No sealed messages. Future You has an empty inbox.</div>';
+    return;
+  }
+  const now = Date.now();
+  el.innerHTML = v2.future.slice().reverse().map(function(item) {
+    const unlocked = now >= item.unlockAt;
+    return '<div class="archive-item ' + (unlocked ? "unlocked" : "locked") + '">' +
+      '<div class="archive-top"><span class="archive-to">' + (unlocked ? "🔓 UNLOCKED" : "🔒 LOCKED") +
+      '</span><span class="archive-date">' + escapeHTML(futureTimeframeLabel(item.days)) + " // " + escapeHTML(new Date(item.unlockAt).toLocaleDateString()) + '</span></div>' +
+      '<div class="small">' + (unlocked ? "Checkpoint reached." : "Future You hasn’t reached this checkpoint yet.") + '</div>' +
+      '<div class="message-actions">' +
+      (unlocked ? '<button class="btn ghost reveal-future" data-id="' + escapeHTML(item.id) + '">REVEAL MESSAGE</button>' : '') +
+      '<button class="btn ghost danger delete-future" data-id="' + escapeHTML(item.id) + '">DELETE MESSAGE</button></div>' +
+      '<div id="future-' + escapeHTML(item.id) + '" class="output hidden"></div></div>';
+  }).join("");
+  el.querySelectorAll(".reveal-future").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      const item = v2.future.find(function(x){return x.id===btn.dataset.id;});
+      if (!item || Date.now() < item.unlockAt) return;
+      const out = document.getElementById("future-" + item.id);
+      out.classList.remove("hidden");
+      out.textContent = item.text;
+      logEvent("Future message revealed.");
+    });
+  });
+  el.querySelectorAll(".delete-future").forEach(function(btn){
+    btn.addEventListener("click",function(){
+      if (!confirm("Delete this sealed message? This cannot be undone.")) return;
+      v2.future = v2.future.filter(function(x){return x.id!==btn.dataset.id;});
+      state.stats.futureMessages = v2.future.length;
+      persistV2(V2_STORAGE.future, v2.future);
+      persist(STORAGE.stats, state.stats);
+      updateStats(); renderFutureMessages(); logEvent("Future message deleted.");
+    });
+  });
+}
+
+function sealFutureMessage() {
+  const text = document.getElementById("futureMessage").value.trim();
+  const selected = document.querySelector('input[name="futureTime"]:checked');
+  if (!text || !selected) return;
+  const days = Number(selected.value);
+  const unlockAt = Date.now() + days*24*60*60*1000;
+  v2.future.push({id: Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,7),text,days,unlockAt});
+  state.stats.futureMessages = v2.future.length;
+  persistV2(V2_STORAGE.future, v2.future);
+  persist(STORAGE.stats, state.stats);
+  updateStats(); renderFutureMessages();
+  document.getElementById("futureMessage").value = "";
+  document.querySelectorAll('input[name="futureTime"]').forEach(function(x){x.checked=false;});
+  setMood("sealed");
+  incrementSystems("Future message sealed");
+  unlockAchievement("capsule");
+}
+
+function renderMood() {
+  const trend = document.getElementById("moodTrend");
+  const recent = v2.mood.slice(-7).reverse();
+  trend.innerHTML = recent.length ? recent.map(function(item){
+    return '<div class="trend-row"><span>' + escapeHTML(item.date) + '</span><span class="bar-track"><span class="bar-fill" style="width:' + (item.energy*10) + '%"></span></span><span>' + item.energy + '</span></div>';
+  }).join("") : '<div class="empty">No experiment data yet.</div>';
+
+  const avg = {};
+  moodMetrics.forEach(function(metric){
+    avg[metric[0]] = v2.mood.length ? v2.mood.reduce(function(sum,item){return sum+Number(item[metric[0]]||0)},0)/v2.mood.length : 0;
+  });
+  document.getElementById("moodAverages").innerHTML = v2.mood.length ? moodMetrics.map(function(metric){
+    return '<div class="avg"><b>' + avg[metric[0]].toFixed(1) + '</b><span>AVG ' + escapeHTML(metric[1]) + '</span></div>';
+  }).join("") : "";
+  const today = new Date().toISOString().slice(0,10);
+  document.getElementById("moodTodayStatus").textContent =
+    v2.mood.some(function(x){return x.dateKey===today;}) ? "TODAY'S ENTRY: saved — logging again will update it." : "TODAY'S ENTRY: not logged yet.";
+}
+
+function logMood() {
+  const today = new Date().toISOString().slice(0,10);
+  const values = getRangeValues(moodMetrics, "mood_");
+  const goodThing = document.getElementById("goodThing").value.trim();
+  const existing = v2.mood.find(function(x){return x.dateKey===today;});
+  if (existing) Object.assign(existing, values, {goodThing:goodThing, dateKey:today});
+  else v2.mood.push(Object.assign({}, values, {goodThing:goodThing, dateKey:today, date:new Date().toLocaleDateString()}));
+  state.stats.moodEntries = v2.mood.length;
+  persistV2(V2_STORAGE.mood, v2.mood);
+  persist(STORAGE.stats, state.stats);
+  updateStats(); renderMood();
+  setMood("data logged");
+  incrementSystems("Mood Experiment logged");
+  if (v2.mood.length >= 2) unlockAchievement("data");
+  if (v2.mood.length >= 4) unlockAchievement("scientist");
+}
+
+function clearMood() {
+  if (!confirm("Clear all Mood Experiment data? This cannot be undone.")) return;
+  v2.mood = [];
+  state.stats.moodEntries = 0;
+  persistV2(V2_STORAGE.mood, []);
+  persist(STORAGE.stats, state.stats);
+  updateStats(); renderMood();
+  logEvent("Mood Experiment data cleared.");
+}
+
+function renderAchievements() {
+  const el = document.getElementById("achievementArchive");
+  const unlocked = achievementDefinitions.filter(function(def){return v2.achievements.includes(def[0]);});
+  if (!unlocked.length) {
+    el.innerHTML = '<div class="empty">No rare system unlocks yet. Keep exploring.</div>';
+    return;
+  }
+  el.innerHTML = unlocked.map(function(def){
+    return '<div class="achievement-item ' + (def[4]==="rare"?"rare":"") + '">' +
+      '<div class="a-icon">' + escapeHTML(def[1]) + '</div><h4>' + escapeHTML(def[2]) + '</h4>' +
+      '<p>' + escapeHTML(def[3]) + '</p><div class="a-meta">UNLOCKED</div></div>';
+  }).join("");
+}
+
+function unlockAchievement(id) {
+  if (v2.achievements.includes(id)) return;
+  const def = achievementDefinitions.find(function(x){return x[0]===id;});
+  if (!def) return;
+  v2.achievements.push(id);
+  state.stats.achievements += 1;
+  persistV2(V2_STORAGE.achievements, v2.achievements);
+  persist(STORAGE.stats, state.stats);
+  updateStats(); renderAchievements();
+  showUnlock(def);
+  logEvent("Achievement unlocked: " + def[2] + ".", "UNLOCK");
+}
+
+function showUnlock(def) {
+  const old = document.querySelector(".unlock-pop");
+  if (old) old.remove();
+  const pop = document.createElement("div");
+  pop.className = "unlock-pop";
+  pop.innerHTML = "<h3>ACHIEVEMENT UNLOCKED</h3><p>" + escapeHTML(def[1] + " " + def[2]) + "</p>";
+  document.body.appendChild(pop);
+  setTimeout(function(){if(pop.parentNode)pop.remove()},4200);
+}
+
+function maybeSystemExplorer() {
+  const used = ["brain","parent","future","loop","compare","burnout","letter","signal","achievement","map","rabbit","futureme","mood"];
+  const count = used.reduce(function(n,k){return n+(localStorage.getItem("unsaid_used_"+k)==="1"?1:0)},0);
+  if (count >= 6) unlockAchievement("explorer");
+}
+function markSystemUsed(key) {
+  try{localStorage.setItem("unsaid_used_"+key,"1")}catch(e){}
+  maybeSystemExplorer();
+}
+
+function recordEgg(id) {
+  if (v2.eggs.includes(id)) return;
+  v2.eggs.push(id);
+  state.stats.easterEggs = v2.eggs.length;
+  persistV2(V2_STORAGE.eggs, v2.eggs);
+  persist(STORAGE.stats, state.stats);
+  updateStats();
+  unlockAchievement("egg");
+  showSecret();
+  logEvent("SECRET SYSTEM DETECTED.", "SECRET");
+}
+function showSecret() {
+  const old=document.querySelector(".egg-screen");
+  if(old)old.remove();
+  const screen=document.createElement("div");
+  screen.className="egg-screen";
+  screen.innerHTML="<strong>████████████████████</strong><strong>SECRET SYSTEM FOUND</strong><strong>████████████████████</strong><span>you weren't supposed to find this.</span>";
+  document.getElementById("console").appendChild(screen);
+}
+
+function renderV2() {
+  createRangeControl("brainMapControls", brainCategories, "brain_");
+  createRangeControl("moodControls", moodMetrics, "mood_");
+  if (v2.brainMap && Object.keys(v2.brainMap).length) {
+    setRangeValues(brainCategories,"brain_",v2.brainMap);
+    renderBrainMap(v2.brainMap);
+  }
+  renderRabbit();
+  renderFutureMessages();
+  renderMood();
+  renderAchievements();
+  updateStats();
+}
+
+document.getElementById("brainMapGenerate").addEventListener("click",generateBrainMap);
+document.getElementById("brainMapReset").addEventListener("click",resetBrainMap);
+document.getElementById("rabbitBtn").addEventListener("click",rabbitDeepen);
+document.getElementById("rabbitReset").addEventListener("click",resetRabbit);
+document.getElementById("futureSealBtn").addEventListener("click",sealFutureMessage);
+document.getElementById("moodLogBtn").addEventListener("click",logMood);
+document.getElementById("moodClearBtn").addEventListener("click",clearMood);
+
+/* Harmless hidden interactions:
+   - rapid logo clicks
+   - keyboard sequence: U N S A I D
+   - console command typed into the Rabbit Hole input: UNSAID://SECRET
+*/
+let logoClicks = [];
+document.querySelector(".logo").addEventListener("click",function(){
+  const now=Date.now();
+  logoClicks=logoClicks.filter(function(t){return now-t<850});
+  logoClicks.push(now);
+  if(logoClicks.length>=5){recordEgg("logo");logoClicks=[];}
+});
+let secretKeys = [];
+document.addEventListener("keydown",function(e){
+  if (e.key.length!==1) return;
+  secretKeys.push(e.key.toLowerCase());
+  if(secretKeys.length>6) secretKeys.shift();
+  if(secretKeys.join("")==="unsaid"){recordEgg("keys");secretKeys=[];}
+});
+document.getElementById("rabbitInput").addEventListener("keydown",function(e){
+  if(e.key==="Enter" && e.target.value.trim().toUpperCase()==="UNSAID://SECRET"){
+    recordEgg("command"); e.target.value="";
+  }
+});
+
+const originalUpdateStats = updateStats;
+updateStats = function(){
+  originalUpdateStats();
+  const ids = ["brainMapsStat","rabbitHolesStat","futureMessagesStat","moodEntriesStat","easterEggsStat"];
+  const vals = [state.stats.brainMaps,state.stats.rabbitHoles,state.stats.futureMessages,state.stats.moodEntries,state.stats.easterEggs];
+  ids.forEach(function(id,i){const el=document.getElementById(id);if(el)el.textContent=vals[i];});
+};
+
+/* Make existing actions contribute to SYSTEM EXPLORER without altering their behavior. */
+const oldScanBrain = scanBrain;
+scanBrain = function(key){oldScanBrain(key);markSystemUsed("brain");};
+const oldParent = runParent;
+runParent = function(){oldParent();markSystemUsed("parent");};
+const oldFuture = scanFuture;
+scanFuture = function(){oldFuture();markSystemUsed("future");};
+const oldLoop = startLoop;
+startLoop = function(){oldLoop();markSystemUsed("loop");};
+const oldCompare = breakComparison;
+breakComparison = function(){oldCompare();markSystemUsed("compare");};
+const oldBurnout = burnout;
+burnout = function(k){oldBurnout(k);markSystemUsed("burnout");};
+const oldLetter = archiveLetter;
+archiveLetter = function(){oldLetter();markSystemUsed("letter");};
+const oldSignal = saveSignal;
+saveSignal = function(){oldSignal();markSystemUsed("signal");};
+const oldAchievement = generateAchievement;
+generateAchievement = function(){oldAchievement();markSystemUsed("achievement");};
+const oldGenerateMap = generateBrainMap;
+generateBrainMap = function(){oldGenerateMap();markSystemUsed("map");};
+const oldRabbit = rabbitDeepen;
+rabbitDeepen = function(){oldRabbit();markSystemUsed("rabbit");};
+const oldSeal = sealFutureMessage;
+sealFutureMessage = function(){oldSeal();markSystemUsed("futureme");};
+const oldMood = logMood;
+logMood = function(){oldMood();markSystemUsed("mood");};
+
+/* Existing achievement generator now also unlocks a corresponding archive entry. */
+const originalAchievementPool = achievementPool;
+const oldGenerateAchievementV2 = generateAchievement;
+generateAchievement = function(){
+  oldGenerateAchievementV2();
+  const text = document.getElementById("achievementOutput").textContent || "";
+  const def = achievementDefinitions.find(function(x){return text.indexOf(x[2])>=0;});
+  if(def) unlockAchievement(def[0]);
+  markSystemUsed("achievement");
+};
+
+renderV2();
+
+function scanBrain(key) {
+  const response = decodeResponses[key];
+  if (!response) return;
+  document.querySelectorAll("#brainChoices .choice").forEach(function(btn) {
+    btn.classList.toggle("active", btn.dataset.key === key);
+  });
+  document.getElementById("brainOutput").textContent = response.text;
+  setMood(response.mood);
+  incrementSystems("DECODE MY BRAIN");
+}
+
+function runParent() {
+  const text = `PARENT.EXE says: study → marks → career → stable future → repeat.
+
+Hidden process detected: they may be trying to protect your future using the tools they understand.
+
+You can still have your own version of the future.`;
+  const el = document.getElementById("parentOutput");
+  el.classList.remove("hidden");
+  el.textContent = text;
+  setMood("family process");
+  incrementSystems("PARENT.EXE");
+}
+
+function scanFuture() {
+  const el = document.getElementById("futureOutput");
+  el.classList.remove("hidden");
+  el.textContent = futureResponses[Math.floor(Math.random() * futureResponses.length)];
+  setMood("uncertain");
+  incrementSystems("FUTURE_404");
+}
+
+function startLoop() {
+  const input = document.getElementById("loopThought").value.trim();
+  const thought = input || "Why did I say that?";
+  const el = document.getElementById("loopOutput");
+  el.classList.remove("hidden");
+  el.textContent = `INPUT: "${thought}"
+
+LOOP DETECTED:
+→ What if it meant something?
+→ What if I messed up?
+→ What if they noticed?
+→ What if I fix it?
+→ What if fixing it makes it worse?
+→ repeat...
+
+SYSTEM INTERRUPT:
+A thought can be loud without being a command. Pause the loop before believing every prediction.`;
+  setMood("looping");
+  incrementSystems("OVERTHINKING.INFINITE");
+}
+
+function breakComparison() {
+  const el = document.getElementById("compareOutput");
+  el.classList.remove("hidden");
+  el.textContent = `COMPARISON_LOOP INTERRUPTED.
+
+Visible: their result.
+Invisible: their doubts, timing, help, setbacks, context.
+
+Your progress does not become fake because somebody else's progress is visible.`;
+  setMood("context restored");
+  incrementSystems("COMPARISON_LOOP");
+}
+
+function burnout(stateKey) {
+  const response = burnoutResponses[stateKey];
+  if (!response) return;
+  document.querySelectorAll(".burnout-choice").forEach(function(btn) {
+    btn.classList.toggle("active", btn.dataset.state === stateKey);
+  });
+  document.getElementById("burnoutOutput").textContent = response;
+  setMood(stateKey === "empty" ? "needs support" : "resource check");
+  incrementSystems("BURNOUT.SYS");
+}
+
+function archiveLetter() {
+  const to = document.getElementById("letterTo").value.trim();
+  const text = document.getElementById("letterText").value.trim();
+  if (!text) {
+    document.getElementById("letterText").focus();
+    document.getElementById("letterArchive").insertAdjacentHTML(
+      "afterbegin", '<div class="empty">Nothing to archive yet. The message box is still waiting.</div>'
+    );
+    return;
+  }
+  const item = {
+    to: to || "nobody",
+    text: text,
+    date: new Date().toLocaleString()
+  };
+  state.letters.push(item);
+  state.stats.letters = state.letters.length;
+  persist(STORAGE.letters, state.letters);
+  persist(STORAGE.stats, state.stats);
+  document.getElementById("letterTo").value = "";
+  document.getElementById("letterText").value = "";
+  renderLetters();
+  updateStats();
+  setMood("unfiltered");
+  incrementSystems("Letter archived");
+}
+
+function saveSignal() {
+  const text = document.getElementById("signalText").value.trim();
+  if (!text) {
+    document.getElementById("signalText").focus();
+    return;
+  }
+  state.signals.push({ text: text, date: new Date().toLocaleString() });
+  state.stats.signals = state.signals.length;
+  persist(STORAGE.signals, state.signals);
+  persist(STORAGE.stats, state.stats);
+  document.getElementById("signalText").value = "";
+  renderSignals();
+  updateStats();
+  setMood("signal received");
+  incrementSystems("Signal saved");
+}
+
+function generateAchievement() {
+  const item = achievementPool[Math.floor(Math.random() * achievementPool.length)];
+  const el = document.getElementById("achievementOutput");
+  el.classList.remove("hidden");
+  el.innerHTML =
+    '<div class="badge">' + escapeHTML(item[0]) + '</div>' +
+    '<h3>' + escapeHTML(item[1]) + '</h3>' +
+    '<p>' + escapeHTML(item[2]) + '</p>';
+  state.stats.achievements += 1;
+  persist(STORAGE.stats, state.stats);
+  updateStats();
+  setMood("achievement unlocked");
+  incrementSystems("ACHIEVEMENT GENERATOR");
+}
+
+document.getElementById("enterBtn").addEventListener("click", enterOS);
+
+document.querySelectorAll("#brainChoices .choice").forEach(function(btn) {
+  btn.addEventListener("click", function() { scanBrain(btn.dataset.key); });
+});
+document.getElementById("parentBtn").addEventListener("click", runParent);
+document.getElementById("futureBtn").addEventListener("click", scanFuture);
+document.getElementById("loopBtn").addEventListener("click", startLoop);
+document.getElementById("compareBtn").addEventListener("click", breakComparison);
+document.querySelectorAll(".burnout-choice").forEach(function(btn) {
+  btn.addEventListener("click", function() { burnout(btn.dataset.state); });
+});
+document.getElementById("letterBtn").addEventListener("click", archiveLetter);
+document.getElementById("signalBtn").addEventListener("click", saveSignal);
+document.getElementById("achievementBtn").addEventListener("click", generateAchievement);
+
+document.getElementById("loopThought").addEventListener("keydown", function(e) {
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") startLoop();
+});
+document.getElementById("letterText").addEventListener("keydown", function(e) {
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") archiveLetter();
+});
+document.getElementById("signalText").addEventListener("keydown", function(e) {
+  if ((e.ctrlKey || e.metaKey) && e.key === "Enter") saveSignal();
+});
+
+loadState();
+updateStats();
+boot();
+</script>
+</body>
+</html>
