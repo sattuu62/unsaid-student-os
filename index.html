@@ -2,5041 +2,3316 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <meta name="theme-color" content="#050607">
-
 <title>UNSAID // STUDENT_OS</title>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.min.js"></script>
-
 <style>
-/* =========================================================
-   UNSAID // STUDENT_OS
-   V4 — FINAL BUILD
-   ========================================================= */
-
-*{
-    box-sizing:border-box;
-}
-
+*{box-sizing:border-box}
 :root{
-    --bg:#050607;
-    --panel:#0a0c0e;
-    --panel2:#101316;
-    --text:#f1f5f4;
-    --muted:#76807d;
-    --line:#202723;
-    --accent:#baffc9;
-    --danger:#ff5555;
-    --soft:#111815;
+  --bg:#050607;
+  --panel:#0a0d0b;
+  --panel2:#101512;
+  --text:#edf4ef;
+  --muted:#7c8982;
+  --line:#202a24;
+  --accent:#baffc9;
+  --accent2:#83d99b;
+  --danger:#ff6262;
+  --shadow:0 20px 70px rgba(0,0,0,.45);
 }
-
-html{
-    scroll-behavior:smooth;
-}
-
+html{scroll-behavior:smooth}
 body{
-    margin:0;
-    min-height:100vh;
-    background:
-        radial-gradient(circle at 50% -20%,#18201c 0%,#070908 38%,#030404 75%);
-    color:var(--text);
-    font-family:
-        Inter,
-        ui-monospace,
-        SFMono-Regular,
-        Menlo,
-        Monaco,
-        Consolas,
-        monospace;
-    overflow-x:hidden;
+  margin:0;
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 50% -10%,#17201b 0%,#070908 35%,#030404 78%);
+  color:var(--text);
+  font-family:Inter,ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+  overflow-x:hidden;
 }
-
 body::before{
-    content:"";
-    pointer-events:none;
-    position:fixed;
-    inset:0;
-    z-index:99999;
-    opacity:.18;
-    background:
-        repeating-linear-gradient(
-            to bottom,
-            transparent 0px,
-            transparent 3px,
-            rgba(255,255,255,.025) 4px
-        );
-    mix-blend-mode:screen;
+  content:"";
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:99999;
+  opacity:.12;
+  background:repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 3px,
+    rgba(255,255,255,.035) 4px
+  );
 }
-
-button,
-input,
-textarea{
-    font:inherit;
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible{
+  outline:1px solid var(--accent);
+  outline-offset:2px;
 }
-
-button{
-    cursor:pointer;
-}
-
-::selection{
-    background:#c8ffe0;
-    color:#000;
-}
-
-/* =========================================================
-   GENERAL
-   ========================================================= */
-
-.hidden{
-    display:none !important;
-}
-
-.screen{
-    min-height:100vh;
-}
-
-.glass{
-    background:rgba(9,12,10,.78);
-    border:1px solid var(--line);
-    backdrop-filter:blur(16px);
-}
-
-.muted{
-    color:var(--muted);
-}
-
-.small{
-    font-size:.78rem;
-}
-
+.hidden{display:none!important}
+.screen{min-height:100vh}
+.muted{color:var(--muted)}
+.small{font-size:.75rem}
 .label{
-    font-size:.7rem;
-    text-transform:uppercase;
-    letter-spacing:.18em;
-    color:#78827d;
+  color:#76837c;
+  font-size:.68rem;
+  text-transform:uppercase;
+  letter-spacing:.18em;
 }
-
+.glass{
+  background:rgba(8,11,9,.82);
+  border:1px solid var(--line);
+  backdrop-filter:blur(18px);
+}
 .btn{
-    border:1px solid #28322d;
-    background:#0c100e;
-    color:#eaf4ef;
-    padding:.8rem 1rem;
-    transition:.18s ease;
+  border:1px solid #29342d;
+  background:#0b100d;
+  color:#eaf2ed;
+  padding:11px 15px;
+  transition:.18s ease;
 }
-
 .btn:hover{
-    border-color:#7cae8e;
-    background:#121915;
-    transform:translateY(-2px);
+  background:#121a15;
+  border-color:#789581;
+  transform:translateY(-2px);
 }
-
 .btn.primary{
-    background:#d5ffe1;
-    color:#061009;
-    border-color:#d5ffe1;
-    font-weight:900;
+  background:var(--accent);
+  border-color:var(--accent);
+  color:#061009;
+  font-weight:900;
 }
-
 .btn.danger{
-    border-color:#5a2525;
-    color:#ff8f8f;
+  color:#ff9999;
+  border-color:#5b2929;
+}
+input,textarea,select{
+  width:100%;
+  background:#050706;
+  color:white;
+  border:1px solid #27312b;
+  padding:13px;
+  outline:none;
 }
-
-.status-dot{
-    width:7px;
-    height:7px;
-    border-radius:100px;
-    background:#9cffbc;
-    box-shadow:0 0 16px #9cffbc;
-    display:inline-block;
-    margin-right:7px;
-}
-
-/* =========================================================
-   BOOT
-   ========================================================= */
-
-#boot{
-    position:fixed;
-    inset:0;
-    z-index:100000;
-    background:#020303;
-    display:grid;
-    place-items:center;
-    padding:24px;
-}
-
-.bootbox{
-    width:min(700px,100%);
-}
-
-.boot-title{
-    font-size:clamp(1.3rem,5vw,2.7rem);
-    letter-spacing:.08em;
-    margin-bottom:25px;
-}
-
-#bootLog{
-    min-height:160px;
-    line-height:1.8;
-    color:#9ea9a4;
-    font-size:.83rem;
-}
-
-.boot-enter{
-    opacity:0;
-    pointer-events:none;
-    margin-top:20px;
-}
-
-.boot-enter.ready{
-    opacity:1;
-    pointer-events:auto;
-}
-
-/* =========================================================
-   ONBOARDING
-   ========================================================= */
-
-#onboarding{
-    min-height:100vh;
-    padding:40px 20px;
-    display:grid;
-    place-items:center;
-}
-
-.onboard-box{
-    width:min(980px,100%);
-}
-
-.onboard-step{
-    animation:fadeUp .5s ease;
-}
-
-.onboard-title{
-    font-size:clamp(2rem,8vw,5.8rem);
-    line-height:.92;
-    margin:10px 0 25px;
-    letter-spacing:-.07em;
-}
-
-.onboard-text{
-    color:#abb5b0;
-    max-width:650px;
-    line-height:1.7;
-}
-
-.choice-grid{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:10px;
-    margin-top:30px;
-}
-
-.choice{
-    min-height:95px;
-    text-align:left;
-    padding:18px;
-    border:1px solid #202824;
-    background:#090c0a;
-    color:#e9efec;
-    transition:.2s;
-}
-
-.choice:hover,
-.choice.selected{
-    background:#111814;
-    border-color:#86a993;
-    transform:translateY(-3px);
-}
-
-.companion-grid{
-    display:grid;
-    grid-template-columns:repeat(5,1fr);
-    gap:8px;
-    margin-top:25px;
-}
-
-.companion-card{
-    border:1px solid #202824;
-    background:#090c0a;
-    padding:20px 10px;
-    color:white;
-    text-align:center;
-    min-height:125px;
-}
-
-.companion-card .emoji{
-    display:block;
-    font-size:2rem;
-    margin-bottom:10px;
-}
-
-.companion-card:hover,
-.companion-card.selected{
-    border-color:#b9dfc5;
-    background:#121814;
-}
-
-.name-input{
-    width:min(400px,100%);
-    margin-top:20px;
-    border:1px solid #253029;
-    background:#050706;
-    color:white;
-    padding:14px;
-    outline:none;
-}
-
-@keyframes fadeUp{
-    from{opacity:0;transform:translateY(12px);}
-    to{opacity:1;transform:none;}
-}
-
-/* =========================================================
-   MAIN APP
-   ========================================================= */
-
-#app{
-    min-height:100vh;
-}
-
-.topbar{
-    height:60px;
-    position:sticky;
-    top:0;
-    z-index:7000;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:0 18px;
-    background:rgba(3,5,4,.86);
-    backdrop-filter:blur(18px);
-    border-bottom:1px solid #151b18;
-}
-
-.brand{
-    font-weight:900;
-    letter-spacing:.1em;
-    font-size:.82rem;
-}
-
-.top-actions{
-    display:flex;
-    gap:8px;
-}
-
-.icon-btn{
-    width:38px;
-    height:38px;
-    display:grid;
-    place-items:center;
-    background:#090c0a;
-    color:white;
-    border:1px solid #202622;
-}
-
-.main{
-    width:min(1240px,100%);
-    margin:auto;
-    padding:28px 18px 120px;
-}
-
-/* =========================================================
-   HERO
-   ========================================================= */
-
-.hero{
-    min-height:72vh;
-    display:grid;
-    align-content:center;
-    position:relative;
-    overflow:hidden;
-}
-
-.hero::after{
-    content:"MIND // CORE";
-    position:absolute;
-    right:-30px;
-    bottom:40px;
-    font-size:clamp(5rem,14vw,13rem);
-    font-weight:900;
-    color:rgba(255,255,255,.018);
-    letter-spacing:-.1em;
-    pointer-events:none;
-}
-
-.hero-kicker{
-    color:#819088;
-    font-size:.72rem;
-    letter-spacing:.18em;
-}
-
-.hero-title{
-    font-size:clamp(3.6rem,12vw,9rem);
-    line-height:.78;
-    letter-spacing:-.09em;
-    margin:18px 0 30px;
-    max-width:950px;
-}
-
-.hero-title span{
-    color:#87918c;
-}
-
-.hero-copy{
-    max-width:580px;
-    color:#9ba49f;
-    line-height:1.7;
-}
-
-.hero-actions{
-    margin-top:30px;
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-}
-
-.next-mission{
-    margin-top:45px;
-    border-left:2px solid #98d4aa;
-    padding:12px 0 12px 18px;
-    color:#abb7b0;
-}
-
-/* =========================================================
-   SYSTEM NAV
-   ========================================================= */
-
-.system-nav{
-    display:grid;
-    grid-template-columns:repeat(4,1fr);
-    border-top:1px solid #1b211e;
-    border-left:1px solid #1b211e;
-    margin-bottom:100px;
-}
-
-.system-link{
-    min-height:150px;
-    padding:18px;
-    border-right:1px solid #1b211e;
-    border-bottom:1px solid #1b211e;
-    background:transparent;
-    color:white;
-    text-align:left;
-    position:relative;
-    overflow:hidden;
-}
-
-.system-link:hover{
-    background:#0a0e0c;
-}
-
-.system-link .num{
-    color:#56615b;
-    font-size:.7rem;
-}
-
-.system-link strong{
-    position:absolute;
-    bottom:18px;
-    left:18px;
-    font-size:1rem;
-}
-
-.system-link .arrow{
-    position:absolute;
-    right:17px;
-    top:17px;
-    color:#606c66;
-}
-
-/* =========================================================
-   SECTIONS
-   ========================================================= */
-
-.module{
-    margin:120px 0;
-    scroll-margin-top:80px;
-}
-
-.module-head{
-    display:flex;
-    justify-content:space-between;
-    gap:20px;
-    align-items:flex-end;
-    border-bottom:1px solid #1d2521;
-    padding-bottom:18px;
-    margin-bottom:28px;
-}
-
-.module-title{
-    font-size:clamp(2.2rem,6vw,5rem);
-    letter-spacing:-.06em;
-    margin:0;
-}
-
-.module-desc{
-    max-width:430px;
-    color:#7e8983;
-    line-height:1.6;
-}
-
-/* =========================================================
-   MIND CORE
-   ========================================================= */
-
-.core-grid{
-    display:grid;
-    grid-template-columns:1.2fr .8fr;
-    gap:14px;
-}
-
-.core-visual{
-    min-height:500px;
-    border:1px solid #1e2722;
-    background:
-        radial-gradient(circle at 50% 50%,rgba(112,255,164,.07),transparent 35%),
-        #060806;
-    position:relative;
-    overflow:hidden;
-}
-
-.core-center{
-    position:absolute;
-    inset:50% auto auto 50%;
-    width:140px;
-    height:140px;
-    transform:translate(-50%,-50%);
-    border:1px solid #88a991;
-    border-radius:100%;
-    display:grid;
-    place-items:center;
-    text-align:center;
-    box-shadow:0 0 100px rgba(135,255,170,.06);
-}
-
-.orbit{
-    position:absolute;
-    left:50%;
-    top:50%;
-    border:1px solid rgba(180,220,190,.11);
-    border-radius:100%;
-    transform:translate(-50%,-50%);
-}
-
-.orbit.o1{width:280px;height:280px;}
-.orbit.o2{width:420px;height:420px;}
-.orbit.o3{width:580px;height:580px;}
-
-.node{
-    position:absolute;
-    padding:6px 9px;
-    border:1px solid #28322c;
-    background:#080b09;
-    color:#aeb8b3;
-    font-size:.7rem;
-}
-
-.node.n1{left:13%;top:24%;}
-.node.n2{right:10%;top:31%;}
-.node.n3{left:17%;bottom:20%;}
-.node.n4{right:15%;bottom:18%;}
-.node.n5{left:42%;top:8%;}
-
-.core-panel{
-    border:1px solid #1e2722;
-    padding:22px;
-}
-
-.metric{
-    margin:25px 0;
-}
-
-.metric-row{
-    display:flex;
-    justify-content:space-between;
-    font-size:.78rem;
-    margin-bottom:8px;
-}
-
-.metric-bar{
-    height:4px;
-    background:#141a17;
-}
-
-.metric-fill{
-    height:100%;
-    background:#a4cdb0;
-    width:0%;
-    transition:width 1s ease;
-}
-
-.observation{
-    border-top:1px solid #1d2521;
-    padding-top:18px;
-    margin-top:24px;
-    line-height:1.6;
-    color:#a1aaa5;
-}
-
-/* =========================================================
-   DECODE
-   ========================================================= */
-
-.decode-shell{
-    border:1px solid #1d2521;
-    display:grid;
-    grid-template-columns:.85fr 1.15fr;
-    min-height:520px;
-}
-
-.decode-sidebar{
-    padding:24px;
-    border-right:1px solid #1d2521;
-}
-
-.decode-main{
-    padding:28px;
-}
-
-.question{
-    font-size:clamp(1.4rem,4vw,2.6rem);
-    letter-spacing:-.04em;
-    max-width:700px;
-}
-
-.decode-option{
-    display:block;
-    width:100%;
-    text-align:left;
-    color:#b8c2bd;
-    background:#080b09;
-    border:1px solid #1d2521;
-    padding:16px;
-    margin-top:8px;
-}
-
-.decode-option:hover{
-    color:white;
-    border-color:#667c6d;
-}
-
-.decode-result{
-    margin-top:24px;
-    padding:20px;
-    background:#080b09;
-    border-left:2px solid #9dd8ad;
-    line-height:1.8;
-}
-
-/* =========================================================
-   BRAIN LAB
-   ========================================================= */
-
-#brainLab{
-    position:fixed;
-    inset:0;
-    z-index:8500;
-    background:#020403;
-    display:none;
-    overflow:hidden;
-}
-
-body.brain-open #brainLab{
-    display:block;
-}
-
-body.brain-open{
-    overflow:hidden;
-}
-
-body.brain-open #companion{
-    z-index:8700;
-}
-
-.brain-top{
-    height:65px;
-    position:absolute;
-    z-index:10;
-    left:0;
-    right:0;
-    top:0;
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:0 20px;
-    border-bottom:1px solid #17201a;
-    background:rgba(3,5,4,.82);
-}
-
-.brain-layout{
-    position:absolute;
-    inset:65px 0 0;
-    display:grid;
-    grid-template-columns:240px 1fr 330px;
-}
-
-.brain-menu{
-    border-right:1px solid #17201a;
-    padding:20px;
-    overflow:auto;
-    z-index:5;
-    background:rgba(4,7,5,.75);
-}
-
-.brain-choice{
-    width:100%;
-    text-align:left;
-    background:transparent;
-    border:0;
-    border-bottom:1px solid #19211c;
-    color:#78857e;
-    padding:16px 4px;
-}
-
-.brain-choice:hover{
-    color:white;
-}
-
-#brainCanvas{
-    min-width:0;
-    position:relative;
-    overflow:hidden;
-}
-
-#brainFallback{
-    width:100%;
-    height:100%;
-    display:none;
-}
-
-.brain-info{
-    border-left:1px solid #17201a;
-    padding:24px;
-    z-index:5;
-    background:rgba(4,7,5,.79);
-    overflow:auto;
-}
-
-.brain-region-title{
-    font-size:2rem;
-    margin:16px 0;
-}
-
-.brain-help{
-    color:#637068;
-    font-size:.75rem;
-    line-height:1.7;
-    margin-top:30px;
-}
-
-/* =========================================================
-   RABBIT
-   ========================================================= */
-
-.rabbit-stage{
-    min-height:420px;
-    display:grid;
-    place-items:center;
-    border:1px solid #1c2420;
-    background:
-        radial-gradient(circle,#111713 0%,#060807 44%,#030403 100%);
-    text-align:center;
-    padding:30px;
-}
-
-.rabbit-depth{
-    font-size:.7rem;
-    color:#5f6d65;
-    letter-spacing:.2em;
-}
-
-.rabbit-prompt{
-    max-width:700px;
-    font-size:clamp(1.6rem,5vw,3.3rem);
-    letter-spacing:-.05em;
-    margin:24px 0;
-}
-
-/* =========================================================
-   WRITING MODULES
-   ========================================================= */
-
-.writer-grid{
-    display:grid;
-    grid-template-columns:1fr .8fr;
-    gap:12px;
-}
-
-.writer{
-    border:1px solid #1e2522;
-    padding:22px;
-}
-
 textarea{
-    width:100%;
-    min-height:220px;
-    resize:vertical;
-    background:#050706;
-    color:#e9efec;
-    border:1px solid #222b26;
-    padding:16px;
-    outline:none;
-    line-height:1.7;
+  min-height:190px;
+  resize:vertical;
+  line-height:1.7;
 }
-
-input,
-select{
-    width:100%;
-    background:#050706;
-    color:#e9efec;
-    border:1px solid #222b26;
-    padding:12px;
-    outline:none;
-}
-
-.field{
-    margin-bottom:14px;
-}
-
 .action-row{
-    display:flex;
-    gap:8px;
-    flex-wrap:wrap;
-    margin-top:12px;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:14px;
+}
+.status{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+}
+.status i{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#9cffb9;
+  box-shadow:0 0 15px #9cffb9;
 }
 
+/* BOOT */
+#boot{
+  position:fixed;
+  inset:0;
+  z-index:100000;
+  background:#020303;
+  display:grid;
+  place-items:center;
+  padding:25px;
+}
+.bootbox{width:min(720px,100%)}
+.boot-title{
+  font-size:clamp(1.4rem,5vw,2.8rem);
+  letter-spacing:.08em;
+  margin-bottom:25px;
+}
+#bootLog{
+  min-height:165px;
+  color:#9ba69f;
+  line-height:1.8;
+  font-size:.8rem;
+}
+.boot-progress{
+  height:2px;
+  background:#141b17;
+  overflow:hidden;
+}
+.boot-progress i{
+  display:block;
+  width:0;
+  height:100%;
+  background:var(--accent);
+  transition:width .25s;
+}
+.boot-enter{
+  margin-top:22px;
+  opacity:0;
+  pointer-events:none;
+}
+.boot-enter.ready{
+  opacity:1;
+  pointer-events:auto;
+}
+
+/* ONBOARDING */
+#onboarding{
+  min-height:100vh;
+  padding:40px 20px;
+  display:grid;
+  place-items:center;
+}
+.onboard-box{width:min(1000px,100%)}
+.onboard-step{animation:fadeUp .35s ease}
+.onboard-title{
+  font-size:clamp(2.5rem,9vw,6.5rem);
+  line-height:.87;
+  letter-spacing:-.08em;
+  margin:12px 0 25px;
+}
+.onboard-text{
+  max-width:700px;
+  color:#aab5ae;
+  line-height:1.75;
+}
+.choice-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:9px;
+  margin-top:28px;
+}
+.choice{
+  min-height:100px;
+  padding:18px;
+  text-align:left;
+  color:#edf4ef;
+  background:#090c0a;
+  border:1px solid #202923;
+  transition:.2s;
+}
+.choice:hover,.choice.selected{
+  border-color:#8caf97;
+  background:#111813;
+  transform:translateY(-3px);
+}
+.companion-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+  margin-top:25px;
+}
+.companion-card{
+  min-height:135px;
+  padding:18px 10px;
+  text-align:center;
+  color:white;
+  background:#090c0a;
+  border:1px solid #202923;
+}
+.companion-card:hover,.companion-card.selected{
+  border-color:#b9dfc5;
+  background:#121814;
+}
+.companion-card .emoji{
+  display:block;
+  font-size:2.1rem;
+  margin-bottom:10px;
+}
+.name-input{
+  max-width:420px;
+  margin-top:20px;
+}
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(12px)}
+  to{opacity:1;transform:none}
+}
+
+/* APP */
+#app{min-height:100vh}
+.topbar{
+  height:60px;
+  position:sticky;
+  top:0;
+  z-index:7000;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 18px;
+  background:rgba(3,5,4,.88);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid #151c18;
+}
+.brand{
+  font-weight:900;
+  letter-spacing:.1em;
+  font-size:.82rem;
+}
+.top-actions{display:flex;gap:7px}
+.icon-btn{
+  width:39px;
+  height:39px;
+  display:grid;
+  place-items:center;
+  background:#090c0a;
+  color:white;
+  border:1px solid #202722;
+}
+.main{
+  width:min(1240px,100%);
+  margin:auto;
+  padding:28px 18px 120px;
+}
+
+/* HERO */
+.hero{
+  min-height:72vh;
+  display:grid;
+  align-content:center;
+  position:relative;
+  overflow:hidden;
+}
+.hero::after{
+  content:"MIND";
+  position:absolute;
+  right:-25px;
+  bottom:15px;
+  font-size:clamp(6rem,18vw,15rem);
+  font-weight:900;
+  letter-spacing:-.12em;
+  color:rgba(255,255,255,.018);
+  pointer-events:none;
+}
+.hero-kicker{
+  color:#829088;
+  font-size:.7rem;
+  letter-spacing:.2em;
+}
+.hero-title{
+  font-size:clamp(3.8rem,12vw,9rem);
+  line-height:.78;
+  letter-spacing:-.09em;
+  margin:18px 0 28px;
+}
+.hero-title span{color:#7e8983}
+.hero-copy{
+  max-width:620px;
+  color:#9ca8a1;
+  line-height:1.7;
+}
+.hero-actions{
+  margin-top:30px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.next-mission{
+  margin-top:40px;
+  padding:12px 0 12px 18px;
+  border-left:2px solid #98d4aa;
+  color:#abb6b0;
+}
+
+/* NAV */
+.system-nav{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  border-top:1px solid #1b231f;
+  border-left:1px solid #1b231f;
+  margin-bottom:90px;
+}
+.system-link{
+  min-height:145px;
+  padding:18px;
+  text-align:left;
+  color:white;
+  background:transparent;
+  border:0;
+  border-right:1px solid #1b231f;
+  border-bottom:1px solid #1b231f;
+  position:relative;
+}
+.system-link:hover{background:#0b0f0c}
+.system-link .num{color:#56635c;font-size:.68rem}
+.system-link strong{
+  position:absolute;
+  bottom:18px;
+  left:18px;
+}
+.system-link .arrow{
+  position:absolute;
+  right:17px;
+  top:17px;
+  color:#68756e;
+}
+
+/* MODULES */
+.module{
+  margin:120px 0;
+  scroll-margin-top:80px;
+}
+.module-head{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:20px;
+  border-bottom:1px solid #1d2521;
+  padding-bottom:18px;
+  margin-bottom:28px;
+}
+.module-title{
+  font-size:clamp(2.2rem,6vw,5rem);
+  letter-spacing:-.06em;
+  margin:0;
+}
+.module-desc{
+  max-width:450px;
+  color:#7e8983;
+  line-height:1.65;
+}
+
+/* CORE */
+.core-grid{
+  display:grid;
+  grid-template-columns:1.2fr .8fr;
+  gap:12px;
+}
+.core-visual{
+  min-height:500px;
+  position:relative;
+  overflow:hidden;
+  border:1px solid #1e2722;
+  background:
+    radial-gradient(circle at 50% 50%,rgba(112,255,164,.08),transparent 35%),
+    #060806;
+}
+.core-center{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:140px;
+  height:140px;
+  transform:translate(-50%,-50%);
+  border:1px solid #88a991;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  box-shadow:0 0 100px rgba(135,255,170,.07);
+  animation:pulseCore 3s ease-in-out infinite;
+}
+@keyframes pulseCore{
+  50%{box-shadow:0 0 140px rgba(135,255,170,.13)}
+}
+.orbit{
+  position:absolute;
+  left:50%;
+  top:50%;
+  border:1px solid rgba(180,220,190,.1);
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+}
+.o1{width:280px;height:280px}
+.o2{width:420px;height:420px}
+.o3{width:580px;height:580px}
+.node{
+  position:absolute;
+  padding:6px 9px;
+  border:1px solid #28322c;
+  background:#080b09;
+  color:#aeb8b3;
+  font-size:.68rem;
+}
+.n1{left:13%;top:24%}
+.n2{right:10%;top:31%}
+.n3{left:17%;bottom:20%}
+.n4{right:15%;bottom:18%}
+.n5{left:42%;top:8%}
+.core-panel{
+  border:1px solid #1e2722;
+  padding:22px;
+}
+.metric{margin:25px 0}
+.metric-row{
+  display:flex;
+  justify-content:space-between;
+  font-size:.76rem;
+  margin-bottom:8px;
+}
+.metric-bar{
+  height:4px;
+  background:#141a17;
+}
+.metric-fill{
+  height:100%;
+  width:0;
+  background:#a4cdb0;
+  transition:width 1s;
+}
+.observation{
+  border-top:1px solid #1d2521;
+  padding-top:18px;
+  margin-top:24px;
+  color:#a1aaa5;
+  line-height:1.7;
+}
+
+/* DECODE */
+.decode-shell{
+  min-height:520px;
+  display:grid;
+  grid-template-columns:.75fr 1.25fr;
+  border:1px solid #1d2521;
+}
+.decode-sidebar{
+  padding:24px;
+  border-right:1px solid #1d2521;
+}
+.decode-main{padding:28px}
+.question{
+  max-width:720px;
+  font-size:clamp(1.5rem,4vw,2.7rem);
+  letter-spacing:-.04em;
+}
+.decode-option{
+  display:block;
+  width:100%;
+  text-align:left;
+  color:#b8c2bd;
+  background:#080b09;
+  border:1px solid #1d2521;
+  padding:16px;
+  margin-top:8px;
+}
+.decode-option:hover{
+  color:white;
+  border-color:#667c6d;
+}
+.decode-result{
+  margin-top:24px;
+  padding:20px;
+  background:#080b09;
+  border-left:2px solid #9dd8ad;
+  line-height:1.8;
+}
+
+/* WRITERS */
+.writer-grid{
+  display:grid;
+  grid-template-columns:1fr .8fr;
+  gap:12px;
+}
+.writer{
+  border:1px solid #1e2522;
+  padding:22px;
+}
 .archive-list{
-    max-height:420px;
-    overflow:auto;
+  max-height:430px;
+  overflow:auto;
 }
-
 .archive-item{
-    padding:15px 0;
-    border-bottom:1px solid #19211d;
+  padding:15px 0;
+  border-bottom:1px solid #19211d;
+  line-height:1.65;
 }
-
 .archive-date{
-    color:#59645e;
-    font-size:.7rem;
+  color:#59645e;
+  font-size:.68rem;
 }
 
-/* =========================================================
-   ACHIEVEMENTS
-   ========================================================= */
+/* CARDS */
+.card-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:9px;
+}
+.info-card{
+  border:1px solid #1e2722;
+  padding:20px;
+  background:#080b09;
+  min-height:170px;
+}
+.info-card h3{margin-top:0}
 
+/* ACHIEVEMENTS */
 .achievement-grid{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:8px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
 }
-
 .achievement{
-    min-height:130px;
-    border:1px solid #1b221f;
-    padding:17px;
-    opacity:.25;
+  min-height:135px;
+  border:1px solid #1b221f;
+  padding:17px;
+  opacity:.25;
 }
-
 .achievement.unlocked{
-    opacity:1;
-    background:#0a0e0c;
-    border-color:#435148;
+  opacity:1;
+  background:#0a0e0c;
+  border-color:#435148;
 }
-
 .achievement-name{
-    margin:12px 0 8px;
-    font-weight:900;
+  margin:12px 0 8px;
+  font-weight:900;
 }
 
-/* =========================================================
-   COMPANION
-   ========================================================= */
+/* BRAIN LAB */
+#brainLab{
+  position:fixed;
+  inset:0;
+  z-index:8500;
+  display:none;
+  background:#020403;
+  overflow:hidden;
+}
+body.brain-open{overflow:hidden}
+body.brain-open #brainLab{display:block}
+body.brain-open #companion{z-index:8700}
+.brain-top{
+  position:absolute;
+  inset:0 0 auto;
+  height:65px;
+  z-index:20;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 20px;
+  background:rgba(3,5,4,.88);
+  border-bottom:1px solid #17201a;
+}
+.brain-layout{
+  position:absolute;
+  inset:65px 0 0;
+  display:grid;
+  grid-template-columns:230px 1fr 320px;
+}
+.brain-menu{
+  padding:20px;
+  overflow:auto;
+  border-right:1px solid #17201a;
+  background:rgba(4,7,5,.82);
+}
+.brain-choice{
+  width:100%;
+  padding:15px 4px;
+  text-align:left;
+  background:transparent;
+  border:0;
+  border-bottom:1px solid #19211c;
+  color:#78857e;
+}
+.brain-choice:hover{color:white}
+.brain-stage{
+  position:relative;
+  overflow:hidden;
+  display:grid;
+  place-items:center;
+}
+.brain-graphic{
+  width:min(520px,72vw);
+  aspect-ratio:1;
+  position:relative;
+  animation:brainFloat 5s ease-in-out infinite;
+}
+@keyframes brainFloat{
+  50%{transform:translateY(-10px)}
+}
+.brain-half{
+  position:absolute;
+  width:44%;
+  height:63%;
+  top:18%;
+  border:2px solid #9ad7aa;
+  background:
+    repeating-linear-gradient(
+      165deg,
+      transparent 0 17px,
+      rgba(154,215,170,.18) 18px 20px
+    ),
+    radial-gradient(circle,#15241b,#07100b);
+  box-shadow:0 0 70px rgba(126,220,153,.08);
+}
+.brain-half.left{
+  left:8%;
+  border-radius:55% 45% 50% 48%/50% 48% 52% 50%;
+  transform:rotate(-7deg);
+}
+.brain-half.right{
+  right:8%;
+  border-radius:45% 55% 48% 50%/48% 50% 50% 52%;
+  transform:rotate(7deg);
+}
+.brain-stem{
+  position:absolute;
+  left:50%;
+  bottom:13%;
+  width:42px;
+  height:125px;
+  transform:translateX(-50%);
+  border:2px solid #88b996;
+  border-top:0;
+  border-radius:0 0 30px 30px;
+}
+.brain-dot{
+  position:absolute;
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 22px var(--accent);
+  animation:dotPulse 1.7s infinite;
+}
+@keyframes dotPulse{
+  50%{transform:scale(1.7);opacity:.5}
+}
+.d1{left:27%;top:28%}
+.d2{right:27%;top:35%}
+.d3{left:38%;top:55%}
+.d4{right:38%;top:58%}
+.d5{left:48%;top:25%}
+.brain-info{
+  padding:24px;
+  overflow:auto;
+  border-left:1px solid #17201a;
+  background:rgba(4,7,5,.84);
+}
+.brain-region-title{
+  font-size:2rem;
+  margin:16px 0;
+}
+.brain-help{
+  color:#637068;
+  font-size:.74rem;
+  line-height:1.7;
+  margin-top:30px;
+}
 
+/* RABBIT */
+.rabbit-stage{
+  min-height:430px;
+  display:grid;
+  place-items:center;
+  padding:30px;
+  text-align:center;
+  border:1px solid #1c2420;
+  background:radial-gradient(circle,#111713,#060807 45%,#030403);
+}
+.rabbit-prompt{
+  max-width:750px;
+  font-size:clamp(1.6rem,5vw,3.4rem);
+  letter-spacing:-.05em;
+  margin:25px 0;
+}
+
+/* PARENT */
+.parent-box{
+  border:1px solid #1d2521;
+  padding:24px;
+}
+.parent-message{
+  padding:18px;
+  border-left:2px solid #98d4aa;
+  background:#080b09;
+  line-height:1.75;
+  margin:18px 0;
+}
+.parent-response{
+  min-height:120px;
+  padding:18px;
+  border:1px solid #202a24;
+  background:#050706;
+  color:#aeb9b2;
+  line-height:1.75;
+  white-space:pre-wrap;
+}
+
+/* COMPANION */
 #companion{
-    position:fixed;
-    z-index:1500;
-    right:18px;
-    bottom:18px;
-    user-select:none;
-    transition:
-        left .8s cubic-bezier(.2,.8,.2,1),
-        right .8s cubic-bezier(.2,.8,.2,1),
-        bottom .5s ease,
-        transform .2s;
+  position:fixed;
+  z-index:1500;
+  right:18px;
+  bottom:18px;
+  user-select:none;
+  transition:
+    left .8s cubic-bezier(.2,.8,.2,1),
+    right .8s cubic-bezier(.2,.8,.2,1),
+    bottom .5s ease,
+    transform .2s;
 }
-
 .companion-body{
-    width:78px;
-    height:78px;
-    border:1px solid #3a473f;
-    background:rgba(5,8,6,.92);
-    display:grid;
-    place-items:center;
-    border-radius:50%;
-    font-size:2.5rem;
-    box-shadow:0 20px 50px rgba(0,0,0,.5);
-    cursor:pointer;
+  width:78px;
+  height:78px;
+  display:grid;
+  place-items:center;
+  border:1px solid #3a473f;
+  background:rgba(5,8,6,.94);
+  border-radius:50%;
+  font-size:2.5rem;
+  box-shadow:0 20px 50px rgba(0,0,0,.5);
+  cursor:pointer;
+  transition:.2s;
 }
-
+.companion-body:hover{transform:scale(1.08)}
 .companion-dialogue{
-    position:absolute;
-    right:0;
-    bottom:90px;
-    width:230px;
-    padding:12px 14px;
-    background:#070a08;
-    border:1px solid #29332d;
-    color:#c6cfca;
-    line-height:1.45;
-    font-size:.76rem;
-    opacity:0;
-    transform:translateY(8px);
-    pointer-events:none;
-    transition:.25s;
+  position:absolute;
+  right:0;
+  bottom:90px;
+  width:245px;
+  padding:13px 14px;
+  background:#070a08;
+  border:1px solid #29332d;
+  color:#c6cfca;
+  line-height:1.5;
+  font-size:.75rem;
+  opacity:0;
+  transform:translateY(8px);
+  pointer-events:none;
+  transition:.25s;
 }
-
 .companion-dialogue.show{
-    opacity:1;
-    transform:none;
+  opacity:1;
+  transform:none;
+}
+#companion.walk-left{right:calc(100vw - 100px)}
+.guide-bounce{animation:guideBounce .4s ease}
+@keyframes guideBounce{
+  50%{transform:translateY(-14px) rotate(-7deg)}
+}
+.sword-swing{animation:swordSwing .55s ease}
+@keyframes swordSwing{
+  35%{transform:rotate(-18deg) scale(1.15)}
+  70%{transform:rotate(15deg)}
 }
 
-#companion.walk-left{
-    right:calc(100vw - 100px);
+/* MODALS */
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:9000;
+  display:none;
+  place-items:center;
+  padding:20px;
+  background:rgba(0,0,0,.76);
+  backdrop-filter:blur(10px);
+}
+.modal.show{display:grid}
+.modal-box{
+  width:min(700px,100%);
+  max-height:90vh;
+  overflow:auto;
+  padding:25px;
+  background:#070a08;
+  border:1px solid #29332d;
+  box-shadow:var(--shadow);
+}
+.guide-select-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:7px;
+  margin:20px 0;
+}
+.guide-option{
+  padding:15px 8px;
+  text-align:center;
+  color:white;
+  background:#090c0a;
+  border:1px solid #202923;
+}
+.guide-option.active{
+  border-color:var(--accent);
+  background:#111813;
+}
+.guide-option b{
+  display:block;
+  font-size:1.8rem;
+  margin-bottom:7px;
 }
 
-/* cat ears-ish animation */
-
-.cat-bounce{
-    animation:catBounce .35s ease;
+/* INTRO */
+.intro-step{
+  min-height:250px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.intro-number{
+  color:#607069;
+  font-size:.7rem;
+  letter-spacing:.2em;
+}
+.intro-title{
+  font-size:clamp(2rem,6vw,4.5rem);
+  letter-spacing:-.06em;
+  margin:12px 0;
 }
 
-@keyframes catBounce{
-    50%{transform:translateY(-16px) rotate(-7deg);}
-}
-
-/* =========================================================
-   MONSTER
-   ========================================================= */
-
+/* MONSTER */
 #monster{
-    position:fixed;
-    z-index:50000;
-    left:-240px;
-    bottom:8%;
-    display:none;
-    pointer-events:none;
+  position:fixed;
+  z-index:50000;
+  left:-260px;
+  bottom:9%;
+  display:none;
+  pointer-events:none;
 }
-
-.monster-shape{
-    font-size:7rem;
-    filter:
-        grayscale(1)
-        contrast(3)
-        drop-shadow(0 0 20px #444);
-    transform:skewX(-10deg);
-}
-
 #monster.run{
-    display:block;
-    animation:monsterRun 1.5s linear forwards;
+  display:block;
+  animation:monsterRun 1.35s linear forwards;
 }
-
+.monster-shape{
+  font-size:7rem;
+  filter:grayscale(1) contrast(2.7);
+  transform:skewX(-10deg);
+}
 @keyframes monsterRun{
-    0%{
-        left:-250px;
-        transform:translateY(0) rotate(-6deg);
-    }
-    20%{
-        transform:translateY(-40px) rotate(6deg);
-    }
-    40%{
-        transform:translateY(0) rotate(-5deg);
-    }
-    60%{
-        transform:translateY(-35px) rotate(6deg);
-    }
-    80%{
-        transform:translateY(0) rotate(-4deg);
-    }
-    100%{
-        left:110vw;
-        transform:translateY(-20px) rotate(8deg);
-    }
+  0%{left:-250px;transform:translateY(0) rotate(-6deg)}
+  20%{transform:translateY(-35px) rotate(6deg)}
+  40%{transform:translateY(0) rotate(-5deg)}
+  60%{transform:translateY(-32px) rotate(6deg)}
+  80%{transform:translateY(0) rotate(-4deg)}
+  100%{left:110vw;transform:translateY(-18px) rotate(8deg)}
 }
-
-.screen-glitch{
-    animation:glitchScreen .35s steps(2);
-}
-
+.screen-glitch{animation:glitchScreen .35s steps(2)}
 @keyframes glitchScreen{
-    0%{filter:none;}
-    20%{filter:contrast(2) hue-rotate(40deg);}
-    40%{transform:translateX(-5px);}
-    60%{filter:invert(.15);}
-    80%{transform:translateX(5px);}
-    100%{filter:none;transform:none;}
+  20%{filter:contrast(2) hue-rotate(35deg)}
+  40%{transform:translateX(-5px)}
+  60%{filter:invert(.12)}
+  80%{transform:translateX(5px)}
+  100%{filter:none;transform:none}
 }
-
-/* =========================================================
-   UNKNOWN MESSAGE
-   ========================================================= */
-
 #systemAlert{
-    position:fixed;
-    z-index:60000;
-    top:80px;
-    left:50%;
-    transform:translate(-50%,-20px);
-    width:min(420px,calc(100% - 30px));
-    background:#050706;
-    border:1px solid #523232;
-    padding:18px;
-    opacity:0;
-    pointer-events:none;
-    transition:.3s;
+  position:fixed;
+  z-index:60000;
+  top:80px;
+  left:50%;
+  width:min(430px,calc(100% - 30px));
+  padding:18px;
+  transform:translate(-50%,-20px);
+  background:#050706;
+  border:1px solid #523232;
+  opacity:0;
+  pointer-events:none;
+  transition:.3s;
 }
-
 #systemAlert.show{
-    opacity:1;
-    transform:translate(-50%,0);
+  opacity:1;
+  transform:translate(-50%,0);
 }
 
-/* =========================================================
-   TERMINAL
-   ========================================================= */
-
-#terminal{
-    position:fixed;
-    inset:0;
-    z-index:9200;
-    background:rgba(0,0,0,.92);
-    display:none;
-    place-items:center;
-    padding:20px;
-}
-
-#terminal.open{
-    display:grid;
-}
-
-.terminal-box{
-    width:min(800px,100%);
-    min-height:500px;
-    border:1px solid #314038;
-    background:#030504;
-    padding:20px;
-}
-
-#terminalOutput{
-    height:380px;
-    overflow:auto;
-    color:#97aa9e;
-    white-space:pre-wrap;
-    line-height:1.6;
-}
-
-.terminal-input-row{
-    display:flex;
-    gap:10px;
-    border-top:1px solid #1d2922;
-    padding-top:13px;
-}
-
-#terminalInput{
-    border:0;
-    background:transparent;
-}
-
-/* =========================================================
-   TOAST
-   ========================================================= */
-
+/* TOAST */
 #toast{
-    position:fixed;
-    left:18px;
-    bottom:18px;
-    z-index:12000;
-    max-width:340px;
-    padding:12px 15px;
-    border:1px solid #29342e;
-    background:#060806;
-    color:#b7c0bb;
-    opacity:0;
-    transform:translateY(10px);
-    transition:.3s;
-    pointer-events:none;
+  position:fixed;
+  z-index:99990;
+  left:50%;
+  bottom:25px;
+  width:min(430px,calc(100% - 30px));
+  padding:14px 17px;
+  background:#080c0a;
+  border:1px solid #334138;
+  transform:translate(-50%,20px);
+  opacity:0;
+  pointer-events:none;
+  transition:.25s;
 }
-
 #toast.show{
-    opacity:1;
-    transform:none;
+  opacity:1;
+  transform:translate(-50%,0);
 }
 
-/* =========================================================
-   MOBILE
-   ========================================================= */
+/* FOOTER */
+footer{
+  padding:50px 0 10px;
+  color:#4d5952;
+  font-size:.7rem;
+  line-height:1.8;
+}
 
+/* MOBILE */
 @media(max-width:900px){
-
-    .choice-grid,
-    .system-nav{
-        grid-template-columns:repeat(2,1fr);
-    }
-
-    .companion-grid{
-        grid-template-columns:repeat(2,1fr);
-    }
-
-    .core-grid,
-    .decode-shell,
-    .writer-grid{
-        grid-template-columns:1fr;
-    }
-
-    .decode-sidebar{
-        border-right:0;
-        border-bottom:1px solid #1d2521;
-    }
-
-    .brain-layout{
-        grid-template-columns:1fr;
-    }
-
-    .brain-menu{
-        position:absolute;
-        left:0;
-        right:0;
-        top:0;
-        border:0;
-        display:flex;
-        overflow-x:auto;
-        background:rgba(3,5,4,.87);
-        padding:4px 8px;
-        z-index:8;
-    }
-
-    .brain-choice{
-        width:auto;
-        min-width:max-content;
-        border-bottom:0;
-        padding:14px;
-    }
-
-    .brain-info{
-        position:absolute;
-        bottom:0;
-        left:0;
-        right:0;
-        max-height:34vh;
-        border-left:0;
-        border-top:1px solid #17201a;
-    }
-
-    .achievement-grid{
-        grid-template-columns:1fr 1fr;
-    }
-
-    .hero{
-        min-height:80vh;
-    }
-
-    .module{
-        margin:85px 0;
-    }
+  .choice-grid{grid-template-columns:1fr}
+  .companion-grid{grid-template-columns:repeat(3,1fr)}
+  .system-nav{grid-template-columns:repeat(2,1fr)}
+  .core-grid,.writer-grid{grid-template-columns:1fr}
+  .card-grid,.achievement-grid{grid-template-columns:1fr 1fr}
+  .decode-shell{grid-template-columns:1fr}
+  .decode-sidebar{
+    border-right:0;
+    border-bottom:1px solid #1d2521;
+  }
+  .brain-layout{grid-template-columns:1fr}
+  .brain-menu,.brain-info{display:none}
+  .brain-stage{height:100%}
 }
-
-@media(max-width:560px){
-
-    .choice-grid,
-    .system-nav,
-    .achievement-grid{
-        grid-template-columns:1fr;
-    }
-
-    .hero-title{
-        font-size:3.9rem;
-    }
-
-    .module-head{
-        display:block;
-    }
-
-    .module-desc{
-        margin-top:14px;
-    }
-
-    #companion{
-        right:12px;
-        bottom:12px;
-    }
-
-    .companion-body{
-        width:62px;
-        height:62px;
-        font-size:2rem;
-    }
-
-    .companion-dialogue{
-        bottom:72px;
-    }
+@media(max-width:600px){
+  .main{padding-left:13px;padding-right:13px}
+  .system-nav{grid-template-columns:1fr 1fr}
+  .system-link{min-height:125px}
+  .card-grid,.achievement-grid{grid-template-columns:1fr}
+  .companion-grid{grid-template-columns:repeat(2,1fr)}
+  .guide-select-grid{grid-template-columns:repeat(2,1fr)}
+  .hero{min-height:65vh}
+  .module{margin:90px 0}
+  .module-head{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .brain-graphic{width:min(390px,90vw)}
 }
 </style>
 </head>
 
 <body>
 
-<!-- =======================================================
-     BOOT
-     ======================================================= -->
-
+<!-- BOOT -->
 <div id="boot">
-    <div class="bootbox">
-        <div class="label">UNSAID // STUDENT_OS</div>
-        <div class="boot-title">INITIALIZING...</div>
-
-        <div id="bootLog"></div>
-
-        <button
-            id="bootEnter"
-            class="btn primary boot-enter"
-            onclick="enterSystem()">
-            ENTER SYSTEM
-        </button>
+  <div class="bootbox">
+    <div class="label">LOCAL SYSTEM / NO CLOUD CORE</div>
+    <div class="boot-title">UNSAID // STUDENT_OS</div>
+    <div id="bootLog"></div>
+    <div class="boot-progress"><i id="bootProgress"></i></div>
+    <div class="boot-enter" id="bootEnter">
+      <button class="btn primary" id="bootButton">ENTER SYSTEM →</button>
     </div>
+  </div>
 </div>
 
-<!-- =======================================================
-     ONBOARDING
-     ======================================================= -->
+<!-- ONBOARDING -->
+<section id="onboarding" class="hidden">
+  <div class="onboard-box">
 
-<div id="onboarding" class="hidden">
-    <div class="onboard-box">
-
-        <section id="introStep" class="onboard-step">
-            <div class="label">WELCOME // SUBJECT UNKNOWN</div>
-
-            <h1 class="onboard-title">
-                Some things<br>
-                never get said.
-            </h1>
-
-            <p class="onboard-text">
-                This isn't a test. There are no correct answers.
-                Explore thoughts, memories, questions, futures,
-                and whatever else your brain refuses to shut up about.
-            </p>
-
-            <button class="btn primary" onclick="showStartStep()">
-                CONTINUE →
-            </button>
-        </section>
-
-        <section id="startStep" class="onboard-step hidden">
-            <div class="label">STARTING POINT</div>
-
-            <h2>What's happening upstairs?</h2>
-
-            <div class="choice-grid">
-                <button class="choice" onclick="selectStart('overthinking',this)">
-                    <strong>Brain won't stop</strong><br>
-                    <span class="muted small">Too many thoughts. Zero silence.</span>
-                </button>
-
-                <button class="choice" onclick="selectStart('future',this)">
-                    <strong>Future thoughts</strong><br>
-                    <span class="muted small">Tomorrow has entered the chat.</span>
-                </button>
-
-                <button class="choice" onclick="selectStart('comparison',this)">
-                    <strong>Comparison</strong><br>
-                    <span class="muted small">Everyone seems ahead somehow.</span>
-                </button>
-
-                <button class="choice" onclick="selectStart('unsaid',this)">
-                    <strong>Things unsaid</strong><br>
-                    <span class="muted small">Words currently living rent free.</span>
-                </button>
-
-                <button class="choice" onclick="selectStart('brain',this)">
-                    <strong>Explore the brain</strong><br>
-                    <span class="muted small">Open the laboratory.</span>
-                </button>
-
-                <button class="choice" onclick="selectStart('wander',this)">
-                    <strong>Just wander</strong><br>
-                    <span class="muted small">No mission. Maximum side quests.</span>
-                </button>
-            </div>
-        </section>
-
-        <section id="companionStep" class="onboard-step hidden">
-            <div class="label">SELECT GUIDE</div>
-
-            <h2>Every questionable experiment needs a companion.</h2>
-
-            <div class="companion-grid">
-
-                <button class="companion-card" onclick="selectCompanion('cat',this)">
-                    <span class="emoji">🐈</span>
-                    <strong>CAT.exe</strong>
-                    <div class="muted small">chaos / curiosity</div>
-                </button>
-
-                <button class="companion-card" onclick="selectCompanion('brain',this)">
-                    <span class="emoji">🧠</span>
-                    <strong>BRAIN.exe</strong>
-                    <div class="muted small">science / analysis</div>
-                </button>
-
-                <button class="companion-card" onclick="selectCompanion('robot',this)">
-                    <span class="emoji">🤖</span>
-                    <strong>ROBOT.exe</strong>
-                    <div class="muted small">logic / deadpan</div>
-                </button>
-
-                <button class="companion-card" onclick="selectCompanion('void',this)">
-                    <span class="emoji">🌑</span>
-                    <strong>VOID.exe</strong>
-                    <div class="muted small">quiet / mysterious</div>
-                </button>
-
-                <button class="companion-card" onclick="selectCompanion('aki',this)">
-                    <span class="emoji">🎌</span>
-                    <strong>AKI.exe</strong>
-                    <div class="muted small">adventure / energy</div>
-                </button>
-            </div>
-
-            <input
-                id="companionNameInput"
-                class="name-input"
-                placeholder="Optional custom companion name">
-
-            <br><br>
-
-            <button class="btn primary" onclick="finishOnboarding()">
-                INITIALIZE COMPANION →
-            </button>
-        </section>
-
-    </div>
-</div>
-
-<!-- =======================================================
-     APPLICATION
-     ======================================================= -->
-
-<div id="app" class="hidden">
-
-<header class="topbar">
-
-    <div class="brand">
-        <span class="status-dot"></span>
-        UNSAID // STUDENT_OS
+    <div id="onboardStep1" class="onboard-step">
+      <div class="label">INITIALIZATION / 01</div>
+      <h1 class="onboard-title">THIS IS NOT<br>A PRODUCTIVITY APP.</h1>
+      <p class="onboard-text">
+        UNSAID is a private student operating system for thoughts,
+        curiosity, unfinished ideas, memories, future plans and the
+        things that usually stay unsaid.
+      </p>
+      <div class="action-row">
+        <button class="btn primary" id="startOnboarding">INITIALIZE →</button>
+      </div>
     </div>
 
-    <div class="top-actions">
-        <button class="icon-btn" onclick="toggleSound()" title="Sound">
-            <span id="soundIcon">🔇</span>
+    <div id="onboardStep2" class="onboard-step hidden">
+      <div class="label">INITIALIZATION / 02</div>
+      <h1 class="onboard-title">HOW DO YOU<br>USE YOUR BRAIN?</h1>
+      <p class="onboard-text">
+        Pick what feels closest. There is no score and no diagnosis.
+      </p>
+
+      <div class="choice-grid" id="mindChoices">
+        <button class="choice" data-mind="curious">
+          <b>01 / CURIOUS</b><br>
+          <span class="muted">I keep opening new rabbit holes.</span>
         </button>
-
-        <button class="icon-btn" onclick="openTerminal()" title="Terminal">
-            &gt;_
+        <button class="choice" data-mind="overthink">
+          <b>02 / OVERACTIVE</b><br>
+          <span class="muted">My brain refuses to have one tab open.</span>
         </button>
-    </div>
-
-</header>
-
-<main class="main">
-
-<!-- =======================================================
-     HERO
-     ======================================================= -->
-
-<section class="hero">
-
-    <div class="hero-kicker">
-        EXPERIMENTAL THOUGHT ENVIRONMENT // V4 FINAL
-    </div>
-
-    <h1 class="hero-title">
-        ENTER<br>
-        <span>YOUR OWN</span><br>
-        HEAD.
-    </h1>
-
-    <p class="hero-copy">
-        UNSAID is a private exploration space for thoughts,
-        questions, futures, memories and things that are difficult
-        to put into words. Nothing here is a diagnosis.
-        Your data remains inside this browser.
-    </p>
-
-    <div class="hero-actions">
-        <button class="btn primary" onclick="openBrainLab()">
-            ENTER BRAIN LAB
+        <button class="choice" data-mind="creative">
+          <b>03 / CREATIVE</b><br>
+          <span class="muted">Ideas appear faster than I can save them.</span>
         </button>
-
-        <button class="btn" onclick="scrollToModule('decode')">
-            DECODE A THOUGHT
+        <button class="choice" data-mind="quiet">
+          <b>04 / QUIET</b><br>
+          <span class="muted">I notice things before I explain them.</span>
         </button>
+        <button class="choice" data-mind="chaotic">
+          <b>05 / CHAOTIC</b><br>
+          <span class="muted">There is absolutely no system to this system.</span>
+        </button>
+        <button class="choice" data-mind="explorer">
+          <b>06 / EXPLORER</b><br>
+          <span class="muted">I want to click literally everything.</span>
+        </button>
+      </div>
+
+      <div class="action-row">
+        <button class="btn primary" id="mindNext" disabled>CONTINUE →</button>
+      </div>
     </div>
 
-    <div class="next-mission">
-        <div class="label">CURRENT MISSION</div>
-        <div id="missionText">Explore your first system.</div>
+    <div id="onboardStep3" class="onboard-step hidden">
+      <div class="label">INITIALIZATION / 03</div>
+      <h1 class="onboard-title">CHOOSE YOUR<br>GUIDE.</h1>
+      <p class="onboard-text">
+        Your guide is not a personality test. It simply changes how
+        the system reacts to you.
+      </p>
+
+      <div class="companion-grid" id="onboardGuides"></div>
+
+      <input
+        id="customName"
+        class="name-input"
+        maxlength="22"
+        placeholder="Optional guide name..."
+      >
+
+      <div class="action-row">
+        <button class="btn primary" id="finishOnboarding" disabled>
+          OPEN UNSAID →
+        </button>
+      </div>
     </div>
 
+  </div>
 </section>
 
-<!-- =======================================================
-     SYSTEM SELECTOR
-     ======================================================= -->
+<!-- MAIN -->
+<div id="app" class="hidden">
 
-<nav class="system-nav">
+  <header class="topbar">
+    <div class="brand">UNSAID // STUDENT_OS</div>
 
-    <button class="system-link" onclick="scrollToModule('mindCore')">
+    <div class="top-actions">
+      <button class="icon-btn" id="changeGuideBtn" title="Change guide">⚙</button>
+      <button class="icon-btn" id="soundBtn" title="Sound">🔊</button>
+      <button class="icon-btn" id="introBtn" title="Introduction">?</button>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-kicker">PRIVATE STUDENT OPERATING SYSTEM / LOCAL ONLY</div>
+
+      <h1 class="hero-title">
+        YOUR MIND.<br>
+        <span>UNFILTERED.</span>
+      </h1>
+
+      <p class="hero-copy">
+        A place to investigate your own thinking, dump unfinished thoughts,
+        explore the strange corners of curiosity, write to future-you,
+        map how your brain works and occasionally discover something
+        that absolutely was not supposed to be there.
+      </p>
+
+      <div class="hero-actions">
+        <button class="btn primary" data-scroll="brainModule">ENTER BRAIN LAB</button>
+        <button class="btn" data-scroll="decodeModule">DECODE MY BRAIN</button>
+        <button class="btn" data-scroll="rabbitModule">OPEN RABBIT HOLE</button>
+      </div>
+
+      <div class="next-mission">
+        <span class="label">NEXT SYSTEM MISSION</span><br>
+        <span id="nextMission">Explore something you have never explored before.</span>
+      </div>
+    </section>
+
+    <!-- NAV -->
+    <nav class="system-nav">
+      <button class="system-link" data-scroll="coreModule">
         <span class="num">01</span>
         <span class="arrow">↗</span>
-        <strong>MIND // CORE</strong>
-    </button>
+        <strong>MIND CORE</strong>
+      </button>
 
-    <button class="system-link" onclick="openBrainLab()">
+      <button class="system-link" data-scroll="decodeModule">
         <span class="num">02</span>
         <span class="arrow">↗</span>
-        <strong>BRAIN LAB</strong>
-    </button>
+        <strong>DECODE MY BRAIN</strong>
+      </button>
 
-    <button class="system-link" onclick="scrollToModule('decode')">
+      <button class="system-link" data-scroll="brainModule">
         <span class="num">03</span>
         <span class="arrow">↗</span>
-        <strong>DECODE MY BRAIN</strong>
-    </button>
+        <strong>BRAIN LAB</strong>
+      </button>
 
-    <button class="system-link" onclick="scrollToModule('rabbit')">
+      <button class="system-link" data-scroll="rabbitModule">
         <span class="num">04</span>
         <span class="arrow">↗</span>
         <strong>RABBIT HOLE</strong>
-    </button>
+      </button>
 
-    <button class="system-link" onclick="scrollToModule('future')">
+      <button class="system-link" data-scroll="futureModule">
         <span class="num">05</span>
         <span class="arrow">↗</span>
         <strong>FUTURE ME</strong>
-    </button>
+      </button>
 
-    <button class="system-link" onclick="scrollToModule('letters')">
+      <button class="system-link" data-scroll="lettersModule">
         <span class="num">06</span>
         <span class="arrow">↗</span>
-        <strong>UNSAID LETTERS</strong>
-    </button>
+        <strong>UNSENT LETTERS</strong>
+      </button>
 
-    <button class="system-link" onclick="scrollToModule('parent')">
+      <button class="system-link" data-scroll="parentModule">
         <span class="num">07</span>
         <span class="arrow">↗</span>
-        <strong>PARENT.exe</strong>
-    </button>
+        <strong>PARENT.EXE</strong>
+      </button>
 
-    <button class="system-link" onclick="scrollToModule('observatory')">
+      <button class="system-link" data-scroll="achievementModule">
         <span class="num">08</span>
         <span class="arrow">↗</span>
-        <strong>OBSERVATORY</strong>
-    </button>
+        <strong>ACHIEVEMENTS</strong>
+      </button>
+    </nav>
 
-</nav>
-
-<!-- =======================================================
-     MIND CORE
-     ======================================================= -->
-
-<section id="mindCore" class="module">
-
-    <div class="module-head">
+    <!-- MIND CORE -->
+    <section class="module" id="coreModule">
+      <div class="module-head">
         <div>
-            <div class="label">SYSTEM 01</div>
-            <h2 class="module-title">MIND // CORE</h2>
+          <div class="label">SYSTEM 01</div>
+          <h2 class="module-title">MIND CORE</h2>
         </div>
-
         <p class="module-desc">
-            Not a personality test. This view reflects how you
-            interact with UNSAID and which systems you explore.
+          Not a diagnosis. Not a score. Just a live snapshot of the
+          patterns you choose to explore inside this system.
         </p>
-    </div>
+      </div>
 
-    <div class="core-grid">
-
+      <div class="core-grid">
         <div class="core-visual">
+          <div class="orbit o1"></div>
+          <div class="orbit o2"></div>
+          <div class="orbit o3"></div>
 
-            <div class="orbit o3"></div>
-            <div class="orbit o2"></div>
-            <div class="orbit o1"></div>
+          <div class="node n1">MEMORY</div>
+          <div class="node n2">ATTENTION</div>
+          <div class="node n3">EMOTION</div>
+          <div class="node n4">FUTURE</div>
+          <div class="node n5">SELF</div>
 
-            <div class="core-center">
-                <div>
-                    <div class="label">SUBJECT</div>
-                    <strong>YOU</strong>
-                </div>
+          <div class="core-center">
+            <div>
+              <div class="label">CURRENT</div>
+              <strong id="coreGuide">UNKNOWN</strong>
             </div>
-
-            <div class="node n1">MEMORY</div>
-            <div class="node n2">FUTURE</div>
-            <div class="node n3">CURIOSITY</div>
-            <div class="node n4">UNSAID</div>
-            <div class="node n5">THOUGHT</div>
-
+          </div>
         </div>
 
-        <aside class="core-panel">
+        <div class="core-panel">
+          <div class="label">ACTIVITY SIGNALS</div>
 
-            <div class="label">INTERACTION PROFILE</div>
-
-            <div class="metric">
-                <div class="metric-row">
-                    <span>EXPLORATION</span>
-                    <span id="explorationValue">0%</span>
-                </div>
-                <div class="metric-bar">
-                    <div id="explorationBar" class="metric-fill"></div>
-                </div>
+          <div class="metric">
+            <div class="metric-row">
+              <span>EXPLORATION</span>
+              <span id="metricExploreText">0%</span>
             </div>
+            <div class="metric-bar"><div id="metricExplore" class="metric-fill"></div></div>
+          </div>
 
-            <div class="metric">
-                <div class="metric-row">
-                    <span>CURIOSITY</span>
-                    <span id="curiosityValue">0%</span>
-                </div>
-                <div class="metric-bar">
-                    <div id="curiosityBar" class="metric-fill"></div>
-                </div>
+          <div class="metric">
+            <div class="metric-row">
+              <span>REFLECTION</span>
+              <span id="metricReflectText">0%</span>
             </div>
+            <div class="metric-bar"><div id="metricReflect" class="metric-fill"></div></div>
+          </div>
 
-            <div class="metric">
-                <div class="metric-row">
-                    <span>REFLECTION</span>
-                    <span id="reflectionValue">0%</span>
-                </div>
-                <div class="metric-bar">
-                    <div id="reflectionBar" class="metric-fill"></div>
-                </div>
+          <div class="metric">
+            <div class="metric-row">
+              <span>CURIOSITY</span>
+              <span id="metricCuriousText">0%</span>
             </div>
+            <div class="metric-bar"><div id="metricCurious" class="metric-fill"></div></div>
+          </div>
 
-            <div class="metric">
-                <div class="metric-row">
-                    <span>CHAOS INDEX</span>
-                    <span id="chaosValue">???</span>
-                </div>
-                <div class="metric-bar">
-                    <div id="chaosBar" class="metric-fill"></div>
-                </div>
-            </div>
+          <div class="observation" id="coreObservation">
+            System waiting for observations.
+          </div>
+        </div>
+      </div>
+    </section>
 
-            <div id="mindObservation" class="observation">
-                There isn't enough interaction data yet.
-                Go touch suspicious buttons.
-            </div>
-
-            <br>
-
-            <button class="btn" onclick="refreshMindCore()">
-                RESCAN CORE
-            </button>
-
-        </aside>
-
-    </div>
-
-</section>
-
-<!-- =======================================================
-     DECODE
-     ======================================================= -->
-
-<section id="decode" class="module">
-
-    <div class="module-head">
+    <!-- DECODE -->
+    <section class="module" id="decodeModule">
+      <div class="module-head">
         <div>
-            <div class="label">SYSTEM 03</div>
-            <h2 class="module-title">DECODE MY BRAIN</h2>
+          <div class="label">SYSTEM 02</div>
+          <h2 class="module-title">DECODE MY BRAIN</h2>
         </div>
-
         <p class="module-desc">
-            A reflective pattern explorer — not a medical or
-            psychological diagnosis.
+          Choose what feels closest. The result is a reflection pattern,
+          not a medical or psychological diagnosis.
         </p>
-    </div>
+      </div>
 
-    <div class="decode-shell">
-
+      <div class="decode-shell">
         <aside class="decode-sidebar">
-            <div class="label">SESSION</div>
-            <h3 id="decodeProgress">QUESTION 1 / 5</h3>
+          <div class="label">PROTOCOL</div>
+          <p class="muted">
+            Answer instinctively. You can restart whenever you want.
+          </p>
 
-            <p class="muted small">
-                Pick whichever answer feels closest.
-                There are no correct answers.
-            </p>
+          <div id="decodeProgress" style="margin-top:25px">
+            01 / 06
+          </div>
 
-            <br>
-
-            <button class="btn" onclick="resetDecode()">
-                RESET SESSION
-            </button>
+          <div class="action-row">
+            <button class="btn" id="decodeReset">RESET</button>
+          </div>
         </aside>
 
         <div class="decode-main">
-            <div id="decodeQuestion"></div>
+          <div class="label">INPUT REQUIRED</div>
+          <div id="decodeQuestion" class="question"></div>
+          <div id="decodeOptions"></div>
+          <div id="decodeResult" class="decode-result hidden"></div>
         </div>
+      </div>
+    </section>
 
-    </div>
-
-</section>
-
-<!-- =======================================================
-     RABBIT HOLE
-     ======================================================= -->
-
-<section id="rabbit" class="module">
-
-    <div class="module-head">
-
+    <!-- BRAIN LAB -->
+    <section class="module" id="brainModule">
+      <div class="module-head">
         <div>
-            <div class="label">SYSTEM 04</div>
-            <h2 class="module-title">RABBIT HOLE</h2>
+          <div class="label">SYSTEM 03</div>
+          <h2 class="module-title">BRAIN LAB</h2>
         </div>
-
         <p class="module-desc">
-            Curiosity without a syllabus.
+          Explore broad brain systems involved in attention, memory,
+          emotion, imagination and future-oriented thought.
         </p>
+      </div>
 
-    </div>
+      <button class="btn primary" id="openBrain">OPEN 3D-STYLE BRAIN LAB →</button>
+    </section>
 
-    <div class="rabbit-stage">
-
+    <!-- RABBIT -->
+    <section class="module" id="rabbitModule">
+      <div class="module-head">
         <div>
-
-            <div id="rabbitDepth" class="rabbit-depth">
-                DEPTH // 00
-            </div>
-
-            <div id="rabbitPrompt" class="rabbit-prompt">
-                You found a door that wasn't labelled.
-                Obviously you're going to open it.
-            </div>
-
-            <button class="btn primary" onclick="goDeeper()">
-                GO DEEPER
-            </button>
-
-            <button class="btn" onclick="resetRabbit()">
-                ESCAPE
-            </button>
-
+          <div class="label">SYSTEM 04</div>
+          <h2 class="module-title">RABBIT HOLE</h2>
         </div>
-
-    </div>
-
-</section>
-
-<!-- =======================================================
-     FUTURE
-     ======================================================= -->
-
-<section id="future" class="module">
-
-    <div class="module-head">
-        <div>
-            <div class="label">SYSTEM 05</div>
-            <h2 class="module-title">FUTURE ME</h2>
-        </div>
-
         <p class="module-desc">
-            Write something worth finding later.
-            Time capsules are stored locally in this browser.
+          One question. One strange idea. One new trail.
         </p>
-    </div>
+      </div>
 
-    <div class="writer-grid">
-
-        <div class="writer">
-
-            <div class="field">
-                <div class="label">DELIVERY</div>
-                <select id="futureDelay">
-                    <option value="30">30 DAYS</option>
-                    <option value="180">6 MONTHS</option>
-                    <option value="365">1 YEAR</option>
-                    <option value="1095">3 YEARS</option>
-                </select>
-            </div>
-
-            <textarea
-                id="futureText"
-                placeholder="Dear future me..."></textarea>
-
-            <div class="action-row">
-                <button class="btn primary" onclick="saveFuture()">
-                    SEAL CAPSULE
-                </button>
-
-                <button class="btn" onclick="clearFutureDraft()">
-                    CLEAR
-                </button>
-            </div>
-
-            <div class="muted small" style="margin-top:12px">
-                Draft autosaves while you type.
-            </div>
-
-        </div>
-
-        <div class="writer">
-            <div class="label">TIME CAPSULE ARCHIVE</div>
-            <div id="futureList" class="archive-list"></div>
-        </div>
-
-    </div>
-
-</section>
-
-<!-- =======================================================
-     LETTERS
-     ======================================================= -->
-
-<section id="letters" class="module">
-
-    <div class="module-head">
+      <div class="rabbit-stage">
         <div>
-            <div class="label">SYSTEM 06</div>
-            <h2 class="module-title">UNSAID LETTERS</h2>
-        </div>
+          <div class="label">RABBIT DEPTH <span id="rabbitDepth">01</span></div>
+          <div class="rabbit-prompt" id="rabbitPrompt"></div>
 
+          <div class="action-row" style="justify-content:center">
+            <button class="btn primary" id="rabbitNext">GO DEEPER ↓</button>
+            <button class="btn" id="rabbitRandom">RANDOMIZE</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FUTURE -->
+    <section class="module" id="futureModule">
+      <div class="module-head">
+        <div>
+          <div class="label">SYSTEM 05</div>
+          <h2 class="module-title">FUTURE ME</h2>
+        </div>
         <p class="module-desc">
-            Write it without having to send it.
-            Stored only on this device.
+          Leave a message for a version of you who has not arrived yet.
         </p>
-    </div>
+      </div>
 
-    <div class="writer-grid">
-
+      <div class="writer-grid">
         <div class="writer">
+          <div class="label">TRANSMISSION</div>
+          <h3>Write to future-you.</h3>
+          <textarea id="futureText" placeholder="What do you want future-you to know?"></textarea>
 
-            <div class="field">
-                <div class="label">TO</div>
+          <div class="field">
+            <label class="label">OPEN AFTER</label>
+            <select id="futureWhen">
+              <option value="30">30 days</option>
+              <option value="90">90 days</option>
+              <option value="180">180 days</option>
+              <option value="365">1 year</option>
+            </select>
+          </div>
 
-                <select id="letterTo">
-                    <option>Someone</option>
-                    <option>Myself</option>
-                    <option>My future</option>
-                    <option>My past</option>
-                    <option>Nobody</option>
-                </select>
-            </div>
-
-            <textarea
-                id="letterText"
-                placeholder="Something I've never said..."></textarea>
-
-            <div class="action-row">
-
-                <button class="btn primary" onclick="saveLetter()">
-                    PRESERVE LETTER
-                </button>
-
-                <button class="btn" onclick="clearLetterDraft()">
-                    CLEAR
-                </button>
-
-            </div>
-
-            <div class="muted small" style="margin-top:12px">
-                Draft autosaves automatically.
-            </div>
-
+          <div class="action-row">
+            <button class="btn primary" id="saveFuture">STORE TRANSMISSION</button>
+          </div>
         </div>
 
         <div class="writer">
-            <div class="label">ARCHIVE VAULT</div>
-            <div id="letterList" class="archive-list"></div>
+          <div class="label">ARCHIVE</div>
+          <div id="futureArchive" class="archive-list"></div>
         </div>
+      </div>
+    </section>
 
-    </div>
-
-</section>
-
-<!-- =======================================================
-     PARENT EXE
-     ======================================================= -->
-
-<section id="parent" class="module">
-
-    <div class="module-head">
+    <!-- LETTERS -->
+    <section class="module" id="lettersModule">
+      <div class="module-head">
         <div>
-            <div class="label">SYSTEM 07</div>
-            <h2 class="module-title">PARENT.exe</h2>
+          <div class="label">SYSTEM 06</div>
+          <h2 class="module-title">UNSENT LETTERS</h2>
         </div>
-
         <p class="module-desc">
-            Practice putting difficult thoughts into words.
-            Generated responses are fictional reflection prompts,
-            not messages from a real parent.
+          Say what you never sent. Nothing leaves this device.
         </p>
-    </div>
+      </div>
 
-    <div class="writer-grid">
-
+      <div class="writer-grid">
         <div class="writer">
+          <div class="label">RECIPIENT</div>
+          <input id="letterTo" placeholder="Someone / nobody / future me">
 
-            <textarea
-                id="parentMessage"
-                placeholder="What are you trying to say?"></textarea>
+          <div class="label" style="margin-top:18px">LETTER</div>
+          <textarea id="letterText" placeholder="Dear..."></textarea>
 
-            <div class="action-row">
-
-                <button class="btn primary" onclick="sendParentMessage()">
-                    SEND TO SIMULATION
-                </button>
-
-                <button class="btn" onclick="generateParentPerspective()">
-                    GENERATE PRACTICE RESPONSE
-                </button>
-
-                <button class="btn" onclick="readParentResponse()">
-                    READ RESPONSE
-                </button>
-
-            </div>
-
+          <div class="action-row">
+            <button class="btn primary" id="saveLetter">ARCHIVE LETTER</button>
+            <button class="btn" id="clearLetter">CLEAR</button>
+          </div>
         </div>
 
         <div class="writer">
-
-            <div class="label">PRACTICE CONVERSATION</div>
-
-            <div
-                id="parentConversation"
-                class="archive-list">
-                Nothing here yet.
-            </div>
-
+          <div class="label">LOCAL ARCHIVE</div>
+          <div id="letterArchive" class="archive-list"></div>
         </div>
+      </div>
+    </section>
 
-    </div>
-
-</section>
-
-<!-- =======================================================
-     OBSERVATORY
-     ======================================================= -->
-
-<section id="observatory" class="module">
-
-    <div class="module-head">
+    <!-- PARENT.EXE -->
+    <section class="module" id="parentModule">
+      <div class="module-head">
         <div>
-            <div class="label">SYSTEM 08</div>
-            <h2 class="module-title">OBSERVATORY</h2>
+          <div class="label">SYSTEM 07</div>
+          <h2 class="module-title">PARENT.EXE</h2>
         </div>
-
         <p class="module-desc">
-            A record of the places you've wandered.
+          Practice explaining something difficult before saying it aloud.
+          This does not contact anyone.
         </p>
-    </div>
+      </div>
 
-    <div class="core-grid">
+      <div class="parent-box">
+        <div class="label">MESSAGE INPUT</div>
+        <textarea id="parentInput" placeholder="Type what you wish you could explain..."></textarea>
 
-        <div class="core-panel">
-
-            <div class="label">SYSTEM ACTIVITY</div>
-
-            <div id="statsOutput" style="line-height:2.25;margin-top:20px"></div>
-
+        <div class="action-row">
+          <button class="btn" id="parentGenerate">GENERATE RESPONSE</button>
+          <button class="btn primary" id="parentDraft">DRAFT RESPONSE</button>
+          <button class="btn" id="parentNew">NEW MESSAGE</button>
         </div>
 
-        <div class="core-panel">
+        <div class="parent-message hidden" id="parentMessage"></div>
 
-            <div class="label">LATEST ECHO</div>
-
-            <div id="echoOutput" class="observation">
-                Echoes appear after UNSAID has enough local activity
-                to notice connections.
-            </div>
-
+        <div class="label">LOCAL RESPONSE</div>
+        <div class="parent-response" id="parentResponse">
+          No response generated yet.
         </div>
+      </div>
+    </section>
 
-    </div>
-
-</section>
-
-<!-- =======================================================
-     ACHIEVEMENTS
-     ======================================================= -->
-
-<section class="module">
-
-    <div class="module-head">
+    <!-- STATS -->
+    <section class="module" id="statsModule">
+      <div class="module-head">
         <div>
-            <div class="label">DISCOVERY LOG</div>
-            <h2 class="module-title">ACHIEVEMENTS</h2>
+          <div class="label">SYSTEM 08</div>
+          <h2 class="module-title">SYSTEM STATS</h2>
         </div>
-    </div>
+        <p class="module-desc">
+          Your activity inside UNSAID. No leaderboard. No comparison.
+        </p>
+      </div>
 
-    <div id="achievementGrid" class="achievement-grid"></div>
+      <div class="card-grid">
+        <div class="info-card">
+          <div class="label">SESSIONS</div>
+          <h3 id="statSessions">0</h3>
+          <p class="muted">Times the system has been opened.</p>
+        </div>
 
-</section>
+        <div class="info-card">
+          <div class="label">EXPLORATIONS</div>
+          <h3 id="statExplorations">0</h3>
+          <p class="muted">Systems and rabbit holes explored.</p>
+        </div>
 
-</main>
+        <div class="info-card">
+          <div class="label">ARCHIVES</div>
+          <h3 id="statArchives">0</h3>
+          <p class="muted">Letters and future transmissions stored.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="label">CURRENT GUIDE</div>
+          <h3 id="statGuide">—</h3>
+          <p class="muted" id="statGuideText"></p>
+        </div>
+
+        <div class="info-card">
+          <div class="label">SYSTEM AGE</div>
+          <h3 id="statAge">0 days</h3>
+          <p class="muted">Since first initialization.</p>
+        </div>
+
+        <div class="info-card">
+          <div class="label">LOCAL STORAGE</div>
+          <h3>ON DEVICE</h3>
+          <p class="muted">Core data stays in browser storage.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ACHIEVEMENTS -->
+    <section class="module" id="achievementModule">
+      <div class="module-head">
+        <div>
+          <div class="label">SYSTEM 09</div>
+          <h2 class="module-title">ACHIEVEMENTS</h2>
+        </div>
+        <p class="module-desc">
+          Hidden systems reward curiosity, not performance.
+        </p>
+      </div>
+
+      <div class="achievement-grid" id="achievementGrid"></div>
+    </section>
+
+    <!-- CHAOS -->
+    <section class="module" id="chaosModule">
+      <div class="module-head">
+        <div>
+          <div class="label">SYSTEM ???</div>
+          <h2 class="module-title">CHAOS CONSOLE</h2>
+        </div>
+        <p class="module-desc">
+          You found the suspicious section. Obviously you are going to click it.
+        </p>
+      </div>
+
+      <div class="glass" style="padding:25px">
+        <div class="label">AVAILABLE PROCESSES</div>
+
+        <div class="action-row">
+          <button class="btn" id="chaosGuide">ASK THE GUIDE</button>
+          <button class="btn" id="chaosGlitch">GLITCH SYSTEM</button>
+          <button class="btn" id="chaosSecret">UNKNOWN PROCESS</button>
+          <button class="btn danger" id="chaosMonster">DO NOT PRESS</button>
+        </div>
+
+        <p class="muted small" style="margin-top:20px">
+          Everything here is local. Nothing is sent anywhere.
+        </p>
+      </div>
+    </section>
+
+    <footer>
+      UNSAID // STUDENT_OS<br>
+      LOCAL-FIRST / REFLECTIVE / EXPERIMENTAL<br>
+      The system does not diagnose you. It gives you places to think.
+    </footer>
+
+  </main>
 </div>
 
-<!-- =======================================================
-     COMPANION
-     ======================================================= -->
-
-<div id="companion" class="hidden">
-
-    <div
-        id="companionDialogue"
-        class="companion-dialogue">
-        System initialized.
-    </div>
-
-    <div
-        id="companionBody"
-        class="companion-body"
-        onclick="companionClick()">
-        🐈
-    </div>
-
-</div>
-
-<!-- =======================================================
-     BRAIN LAB
-     ======================================================= -->
-
+<!-- BRAIN LAB OVERLAY -->
 <div id="brainLab">
+  <div class="brain-top">
+    <div>
+      <div class="label">BRAIN LAB // LIVE</div>
+      <strong id="brainMode">WHOLE SYSTEM</strong>
+    </div>
+    <button class="btn" id="closeBrain">EXIT LAB ×</button>
+  </div>
 
-    <div class="brain-top">
+  <div class="brain-layout">
 
-        <div>
-            <span class="status-dot"></span>
-            BRAIN LAB // ACTIVE
-        </div>
+    <aside class="brain-menu">
+      <div class="label">SELECT PATH</div>
 
-        <button class="btn" onclick="closeBrainLab()">
-            EXIT LAB ×
-        </button>
+      <button class="brain-choice" data-brain="pfc">
+        I CAN'T FOCUS
+      </button>
 
+      <button class="brain-choice" data-brain="dmn">
+        I CAN'T STOP THINKING
+      </button>
+
+      <button class="brain-choice" data-brain="amygdala">
+        EVERYTHING FEELS LOUD
+      </button>
+
+      <button class="brain-choice" data-brain="hippocampus">
+        MEMORY MODE
+      </button>
+
+      <button class="brain-choice" data-brain="future">
+        FUTURE THOUGHTS
+      </button>
+
+      <button class="brain-choice" data-brain="all">
+        JUST EXPLORE
+      </button>
+    </aside>
+
+    <div class="brain-stage">
+      <div class="brain-graphic">
+        <div class="brain-half left"></div>
+        <div class="brain-half right"></div>
+        <div class="brain-stem"></div>
+
+        <div class="brain-dot d1"></div>
+        <div class="brain-dot d2"></div>
+        <div class="brain-dot d3"></div>
+        <div class="brain-dot d4"></div>
+        <div class="brain-dot d5"></div>
+      </div>
     </div>
 
-    <div class="brain-layout">
+    <aside class="brain-info">
+      <div class="label">OBSERVATION</div>
+      <h2 class="brain-region-title" id="brainRegionTitle">Whole system</h2>
+      <p id="brainRegionText" class="muted" style="line-height:1.8"></p>
 
-        <aside class="brain-menu">
+      <div class="brain-help">
+        Brain functions are distributed across interacting systems.
+        This lab uses simplified explanations for exploration, not diagnosis.
+      </div>
+    </aside>
 
-            <button class="brain-choice" onclick="selectBrainRegion('pfc')">
-                I CAN'T FOCUS
-            </button>
-
-            <button class="brain-choice" onclick="selectBrainRegion('dmn')">
-                I CAN'T STOP THINKING
-            </button>
-
-            <button class="brain-choice" onclick="selectBrainRegion('amygdala')">
-                EVERYTHING FEELS LOUD
-            </button>
-
-            <button class="brain-choice" onclick="selectBrainRegion('hippocampus')">
-                MEMORY MODE
-            </button>
-
-            <button class="brain-choice" onclick="selectBrainRegion('future')">
-                FUTURE THOUGHTS
-            </button>
-
-            <button class="brain-choice" onclick="selectBrainRegion('all')">
-                JUST EXPLORE
-            </button>
-
-        </aside>
-
-        <div id="brainCanvas">
-
-            <canvas id="brainFallback"></canvas>
-
-        </div>
-
-        <aside class="brain-info">
-
-            <div class="label">SUBJECT // UNKNOWN</div>
-
-            <div id="brainRegionTitle" class="brain-region-title">
-                SELECT A SYSTEM
-            </div>
-
-            <div id="brainRegionText" class="muted" style="line-height:1.7">
-                Rotate the model, investigate regions,
-                or choose an experience from the left.
-            </div>
-
-            <div class="brain-help">
-                DRAG // ROTATE<br>
-                SCROLL // ZOOM<br>
-                CLICK // INVESTIGATE
-            </div>
-
-        </aside>
-
-    </div>
-
+  </div>
 </div>
 
-<!-- =======================================================
-     MONSTER
-     ======================================================= -->
+<!-- INTRO MODAL -->
+<div class="modal" id="introModal">
+  <div class="modal-box">
+    <div id="introContent"></div>
+    <div class="action-row">
+      <button class="btn" id="introBack">← BACK</button>
+      <button class="btn primary" id="introNext">NEXT →</button>
+      <button class="btn hidden" id="introDone">ENTER SYSTEM</button>
+    </div>
+  </div>
+</div>
 
+<!-- GUIDE MODAL -->
+<div class="modal" id="guideModal">
+  <div class="modal-box">
+    <div class="label">SYSTEM SETTINGS</div>
+    <h2 style="font-size:2.5rem;letter-spacing:-.06em">CHANGE GUIDE</h2>
+
+    <p class="muted">
+      Changing the guide does not delete or reset your data.
+    </p>
+
+    <div class="guide-select-grid" id="guideSelectGrid"></div>
+
+    <div class="field">
+      <div class="label">GUIDE NAME</div>
+      <input id="guideNameInput" maxlength="22">
+    </div>
+
+    <div class="action-row">
+      <button class="btn" id="closeGuide">CANCEL</button>
+      <button class="btn primary" id="saveGuide">SAVE GUIDE</button>
+    </div>
+  </div>
+</div>
+
+<!-- MONSTER -->
 <div id="monster">
-    <div class="monster-shape">
-        👤
-    </div>
+  <div class="monster-shape">◢◣</div>
 </div>
-
-<!-- =======================================================
-     SYSTEM ALERT
-     ======================================================= -->
 
 <div id="systemAlert">
-
-    <div class="label">
-        UNKNOWN PROCESS
-    </div>
-
-    <div
-        id="systemAlertText"
-        style="margin-top:8px">
-    </div>
-
-</div>
-
-<!-- =======================================================
-     TERMINAL
-     ======================================================= -->
-
-<div id="terminal">
-
-    <div class="terminal-box">
-
-        <div class="label">
-            UNSAID TERMINAL // TYPE HELP
-        </div>
-
-        <div id="terminalOutput">
-UNSAID terminal initialized.
-Type HELP.
-        </div>
-
-        <div class="terminal-input-row">
-
-            <span>&gt;</span>
-
-            <input
-                id="terminalInput"
-                autocomplete="off"
-                placeholder="command">
-
-            <button class="btn" onclick="closeTerminal()">
-                EXIT
-            </button>
-
-        </div>
-
-    </div>
-
+  <div class="label">SYSTEM EVENT</div>
+  <strong id="alertTitle">UNKNOWN PROCESS</strong>
+  <p id="alertText" class="muted"></p>
 </div>
 
 <div id="toast"></div>
 
+<!-- COMPANION -->
+<div id="companion">
+  <div class="companion-dialogue" id="companionDialogue"></div>
+  <div class="companion-body" id="companionBody">🐈</div>
+</div>
+
 <script>
+(() => {
+"use strict";
+
 /* =========================================================
    STORAGE
-   Keep legacy V3 keys intact.
    ========================================================= */
 
 const STORE = {
-    onboarding:"unsaid_v3_onboarding",
-    companion:"unsaid_v3_companion",
-    companionName:"unsaid_v3_companion_name",
-    start:"unsaid_v3_start",
-    stats:"unsaid_stats_v1",
-    letters:"unsaid_letters_v1",
-    draft:"unsaid_v3_drafts",
-    future:"unsaid_v3_future_messages_v2",
-    map:"unsaid_brain_map_v2",
-    achievements:"unsaid_achievements_v2",
-    easter:"unsaid_easter_eggs_v2",
-
-    // V4 additive keys
-    v4Stats:"unsaid_v4_stats",
-    decode:"unsaid_v4_decode",
-    rabbit:"unsaid_v4_rabbit",
-    parent:"unsaid_v4_parent",
-    sound:"unsaid_v4_sound",
-    echoes:"unsaid_v4_echoes",
-    monsterSeen:"unsaid_v4_monster_seen"
+  onboarding:"unsaid_v3_onboarding",
+  companion:"unsaid_v3_companion",
+  companionName:"unsaid_v3_companion_name",
+  start:"unsaid_v3_start",
+  stats:"unsaid_stats_v1",
+  letters:"unsaid_letters_v1",
+  draft:"unsaid_v3_drafts",
+  future:"unsaid_v3_future_messages_v2",
+  map:"unsaid_brain_map_v2",
+  achievements:"unsaid_achievements_v2",
+  easter:"unsaid_easter_eggs_v2",
+  sound:"unsaid_v4_sound",
+  intro:"unsaid_v4_intro_complete",
+  guideName:"unsaid_v4_guide_name",
+  mind:"unsaid_v4_mind"
 };
 
-function readJSON(key,fallback){
-    try{
-        return JSON.parse(localStorage.getItem(key)) ?? fallback;
-    }catch{
-        return fallback;
-    }
+function safeGet(key, fallback=null){
+  try{
+    const raw=localStorage.getItem(key);
+    return raw===null ? fallback : JSON.parse(raw);
+  }catch(e){
+    return fallback;
+  }
 }
 
-function saveJSON(key,value){
+function safeSet(key,value){
+  try{
     localStorage.setItem(key,JSON.stringify(value));
+    return true;
+  }catch(e){
+    return false;
+  }
 }
+
+function safeRemove(key){
+  try{localStorage.removeItem(key)}catch(e){}
+}
+
+function clone(value){
+  try{return JSON.parse(JSON.stringify(value))}catch(e){return value}
+}
+
+/* =========================================================
+   GUIDES
+   ========================================================= */
+
+const GUIDES = {
+  cat:{
+    icon:"🐈",
+    name:"CAT.exe",
+    title:"CHAOS / CURIOSITY",
+    desc:"Sarcastic, curious and suspiciously interested in everything.",
+    entry:"meow.",
+    reactions:[
+      "You clicked it. Obviously.",
+      "This seems suspicious. Continue.",
+      "I investigated it. There are more buttons.",
+      "Your curiosity is becoming statistically dangerous.",
+      "Fine. Open the rabbit hole."
+    ]
+  },
+
+  brain:{
+    icon:"🧠",
+    name:"BRAIN.exe",
+    title:"ANALYSIS / INVESTIGATION",
+    desc:"Scientific, analytical and constantly looking for patterns.",
+    entry:"neural systems online.",
+    reactions:[
+      "Interesting pattern detected.",
+      "Let's separate the signal from the noise.",
+      "Observation recorded.",
+      "That deserves investigation.",
+      "Hypothesis: there is another layer."
+    ]
+  },
+
+  robot:{
+    icon:"🤖",
+    name:"ROBOT.exe",
+    title:"LOGIC / SYSTEM",
+    desc:"Logical, deadpan and mildly concerned by human randomness.",
+    entry:"system online.",
+    reactions:[
+      "Input accepted.",
+      "That was objectively chaotic.",
+      "Processing.",
+      "Probability of another click: extremely high.",
+      "System recommends continuing."
+    ]
+  },
+
+  void:{
+    icon:"🌑",
+    name:"VOID.exe",
+    title:"QUIET / OBSERVANT",
+    desc:"Quiet, strange and always noticing what everyone else misses.",
+    entry:"...",
+    reactions:[
+      "You noticed it too.",
+      "Some things become clearer when they are quiet.",
+      "Keep looking.",
+      "There is more here.",
+      "Not everything needs an explanation."
+    ]
+  },
+
+  aki:{
+    icon:"🎌",
+    name:"AKI.exe",
+    title:"ENERGY / EXPLORATION",
+    desc:"Original anime-style explorer energy with a wooden training sword.",
+    entry:"Let's go.",
+    reactions:[
+      "Okay! Next system!",
+      "That looked interesting. Let's investigate!",
+      "Ready?",
+      "Another door. Obviously we open it.",
+      "Adventure protocol activated!"
+    ]
+  }
+};
 
 /* =========================================================
    STATE
    ========================================================= */
 
-const state = {
-
-    start:
-        localStorage.getItem(STORE.start) || "wander",
-
-    companion:
-        localStorage.getItem(STORE.companion) || "cat",
-
-    companionName:
-        localStorage.getItem(STORE.companionName) || "",
-
-    sound:
-        readJSON(STORE.sound,false),
-
-    stats:
-        readJSON(STORE.v4Stats,{
-            systems:[],
-            brainRegions:[],
-            rabbitDepth:0,
-            letters:0,
-            future:0,
-            decodeSessions:0,
-            companionClicks:0,
-            hiddenEvents:0,
-            visits:0
-        }),
-
-    decodeAnswers:[],
-
-    rabbitDepth:
-        Number(localStorage.getItem(STORE.rabbit) || 0),
-
-    pendingParentResponse:"",
-
-    audioCtx:null
+const DEFAULT_STATS={
+  sessions:0,
+  explorations:0,
+  reflections:0,
+  curiosity:0,
+  archives:0,
+  firstOpen:null
 };
 
-state.stats.visits++;
-saveStats();
-
-/* =========================================================
-   BOOT
-   ========================================================= */
-
-const bootLines = [
-    "loading student_os...",
-    "checking local memory...",
-    "companion subsystem detected.",
-    "brain_lab connection: pending",
-    "thought archive: encrypted locally",
-    "unknown_process: [REDACTED]",
-    "",
-    "system ready."
-];
-
-let bootIndex=0;
-
-function runBoot(){
-
-    const log=document.getElementById("bootLog");
-
-    if(bootIndex < bootLines.length){
-
-        log.innerHTML += bootLines[bootIndex] + "<br>";
-
-        bootIndex++;
-
-        setTimeout(
-            runBoot,
-            130 + Math.random()*180
-        );
-
-    }else{
-
-        document
-            .getElementById("bootEnter")
-            .classList.add("ready");
-
-    }
-}
-
-runBoot();
-
-function enterSystem(){
-
-    document
-        .getElementById("boot")
-        .classList.add("hidden");
-
-    const completed =
-        localStorage.getItem(STORE.onboarding)==="true";
-
-    if(completed){
-        startApp();
-    }else{
-        document
-            .getElementById("onboarding")
-            .classList.remove("hidden");
-    }
-}
-
-/* =========================================================
-   ONBOARDING
-   ========================================================= */
-
-function showStartStep(){
-
-    document.getElementById("introStep")
-        .classList.add("hidden");
-
-    document.getElementById("startStep")
-        .classList.remove("hidden");
-
-}
-
-function selectStart(value,el){
-
-    state.start=value;
-
-    document
-        .querySelectorAll(".choice")
-        .forEach(x=>x.classList.remove("selected"));
-
-    el.classList.add("selected");
-
-    localStorage.setItem(STORE.start,value);
-
-    setTimeout(()=>{
-
-        document.getElementById("startStep")
-            .classList.add("hidden");
-
-        document.getElementById("companionStep")
-            .classList.remove("hidden");
-
-    },260);
-
-}
-
-function selectCompanion(type,el){
-
-    state.companion=type;
-
-    document
-        .querySelectorAll(".companion-card")
-        .forEach(x=>x.classList.remove("selected"));
-
-    el.classList.add("selected");
-
-}
-
-function finishOnboarding(){
-
-    const defaults={
-        cat:"Chaos",
-        brain:"Cortex",
-        robot:"Unit",
-        void:"Void",
-        aki:"Aki"
-    };
-
-    const custom=
-        document
-        .getElementById("companionNameInput")
-        .value
-        .trim();
-
-    state.companionName =
-        custom ||
-        defaults[state.companion];
-
-    localStorage.setItem(
-        STORE.companion,
-        state.companion
-    );
-
-    localStorage.setItem(
-        STORE.companionName,
-        state.companionName
-    );
-
-    localStorage.setItem(
-        STORE.onboarding,
-        "true"
-    );
-
-    startApp();
-
-}
-
-/* =========================================================
-   APP
-   ========================================================= */
-
-function startApp(){
-
-    document.getElementById("onboarding")
-        .classList.add("hidden");
-
-    document.getElementById("app")
-        .classList.remove("hidden");
-
-    document.getElementById("companion")
-        .classList.remove("hidden");
-
-    updateCompanion();
-    loadDrafts();
-    renderLetters();
-    renderFuture();
-    renderParent();
-    renderAchievements();
-    renderStats();
-    refreshMindCore();
-    renderDecode();
-
-    const mission={
-        overthinking:"Try Decode My Brain, then investigate the DMN.",
-        future:"Leave something inside Future Me.",
-        comparison:"Start with Decode My Brain.",
-        unsaid:"Write your first Unsaid Letter.",
-        brain:"Enter the Brain Lab.",
-        wander:"Touch something suspicious."
-    };
-
-    document.getElementById("missionText")
-        .textContent =
-        mission[state.start] ||
-        mission.wander;
-
-    companionSay(
-        companionLines("welcome"),
-        4500
-    );
-
-    setTimeout(maybeRandomEvent,12000);
-}
-
-/* =========================================================
-   NAVIGATION
-   ========================================================= */
-
-function scrollToModule(id){
-
-    const el=document.getElementById(id);
-
-    if(el){
-        el.scrollIntoView({
-            behavior:"smooth",
-            block:"start"
-        });
-
-        trackSystem(id);
-    }
-
-}
-
-function trackSystem(id){
-
-    if(!state.stats.systems.includes(id)){
-        state.stats.systems.push(id);
-        unlock("explorer");
-    }
-
-    saveStats();
-    refreshMindCore();
-    renderStats();
-
-}
-
-/* =========================================================
-   COMPANIONS
-   ========================================================= */
-
-const companions={
-
-    cat:{
-        emoji:"🐈"
-    },
-
-    brain:{
-        emoji:"🧠"
-    },
-
-    robot:{
-        emoji:"🤖"
-    },
-
-    void:{
-        emoji:"🌑"
-    },
-
-    aki:{
-        emoji:"🎌"
-    }
+const state={
+  companion:safeGet(STORE.companion,"cat"),
+  companionName:safeGet(STORE.companionName,""),
+  mind:safeGet(STORE.mind,""),
+  sound:safeGet(STORE.sound,true),
+  stats:Object.assign({},DEFAULT_STATS,safeGet(STORE.stats,{})),
+  letters:safeGet(STORE.letters,[]),
+  future:safeGet(STORE.future,[]),
+  achievements:safeGet(STORE.achievements,[]),
+  rabbitDepth:1,
+  selectedGuide:null,
+  onboardingMind:null,
+  decodeIndex:0,
+  decodeAnswers:[],
+  introIndex:0,
+  parentLast:"",
+  entryPlayed:false
 };
 
-function updateCompanion(){
-
-    const c=
-        companions[state.companion] ||
-        companions.cat;
-
-    document
-        .getElementById("companionBody")
-        .textContent=c.emoji;
-
+if(!GUIDES[state.companion]){
+  state.companion="cat";
 }
 
-function companionLines(context){
-
-    const lines={
-
-        cat:{
-            welcome:"meow. don't press anything labelled UNKNOWN. obviously.",
-            brain:"ooo shiny brain.",
-            rabbit:"this seems like a terrible idea. continue.",
-            future:"future-you better appreciate this.",
-            letter:"I didn't read it. probably.",
-            decode:"brain successfully inconvenienced.",
-            click:"meow.",
-            monster:"...that was NOT me."
-        },
-
-        brain:{
-            welcome:"Exploration environment initialized.",
-            brain:"Neural visualization active.",
-            rabbit:"Curiosity depth increasing.",
-            future:"Future-oriented reflection detected.",
-            letter:"Reflection archived locally.",
-            decode:"Pattern summary generated. Not diagnostic.",
-            click:"Additional input unnecessary.",
-            monster:"Unrecognized process signature."
-        },
-
-        robot:{
-            welcome:"USER detected. Productivity status: questionable.",
-            brain:"Brain located. Congratulations.",
-            rabbit:"This action has no measurable efficiency.",
-            future:"Scheduling interaction with future USER.",
-            letter:"Message stored. Delivery probability: intentionally zero.",
-            decode:"Human brain remains unnecessarily complicated.",
-            click:"Please stop poking the hardware.",
-            monster:"ERROR: absolutely not."
-        },
-
-        void:{
-            welcome:"You came back.",
-            brain:"Look closer.",
-            rabbit:"There is always another level.",
-            future:"It hasn't happened yet.",
-            letter:"Some words only need somewhere to exist.",
-            decode:"Patterns are not identities.",
-            click:"...",
-            monster:"It noticed you."
-        },
-
-        aki:{
-            welcome:"Let's see how deep this place goes.",
-            brain:"Brain Lab! Let's investigate.",
-            rabbit:"SIDE QUEST ACCEPTED.",
-            future:"Send something forward.",
-            letter:"Some words deserve somewhere safe to land.",
-            decode:"New clue unlocked.",
-            click:"Adventure requires fewer pokes.",
-            monster:"WHAT WAS THAT?!"
-        }
-
-    };
-
-    return (
-        lines[state.companion]?.[context] ||
-        "..."
-    );
-
+if(!state.stats.firstOpen){
+  state.stats.firstOpen=Date.now();
 }
 
-function companionSay(text,duration=3000){
-
-    const box=
-        document.getElementById("companionDialogue");
-
-    box.textContent=
-        `${state.companionName || "COMPANION"}: ${text}`;
-
-    box.classList.add("show");
-
-    clearTimeout(companionSay.timer);
-
-    companionSay.timer=setTimeout(()=>{
-        box.classList.remove("show");
-    },duration);
-
-}
-
-function companionClick(){
-
-    state.stats.companionClicks++;
-    saveStats();
-
-    const body=
-        document.getElementById("companionBody");
-
-    body.classList.add("cat-bounce");
-
-    setTimeout(()=>{
-        body.classList.remove("cat-bounce");
-    },400);
-
-    companionSay(
-        companionLines("click")
-    );
-
-    if(state.companion==="cat"){
-        playMeow();
-    }
-
-    if(state.stats.companionClicks>=7){
-        unlock("catwhisperer");
-    }
-
-    if(
-        state.stats.companionClicks===7 &&
-        Math.random()<.7
-    ){
-        showSystemAlert(
-            "COMPANION BEHAVIOUR FLAGGED."
-        );
-    }
-}
-
-/* periodically switch side */
-
-setInterval(()=>{
-
-    const companion=
-        document.getElementById("companion");
-
-    if(
-        document.getElementById("app")
-        .classList.contains("hidden")
-    ) return;
-
-    if(Math.random()<.35){
-        companion.classList.toggle("walk-left");
-    }
-
-},18000);
+state.stats.sessions++;
+safeSet(STORE.stats,state.stats);
 
 /* =========================================================
-   SOUND
+   DOM
    ========================================================= */
 
-function ensureAudio(){
+const $=id=>document.getElementById(id);
 
-    if(!state.audioCtx){
+const boot=$("boot");
+const onboarding=$("onboarding");
+const app=$("app");
+const companion=$("companion");
+const companionBody=$("companionBody");
+const companionDialogue=$("companionDialogue");
 
-        state.audioCtx=
-            new (
-                window.AudioContext ||
-                window.webkitAudioContext
-            )();
+/* =========================================================
+   AUDIO ENGINE
+   ========================================================= */
 
+let audioCtx=null;
+
+function getAudio(){
+  try{
+    if(!audioCtx){
+      const C=window.AudioContext||window.webkitAudioContext;
+      if(!C)return null;
+      audioCtx=new C();
     }
 
-}
-
-function toggleSound(){
-
-    state.sound=!state.sound;
-
-    saveJSON(
-        STORE.sound,
-        state.sound
-    );
-
-    document
-        .getElementById("soundIcon")
-        .textContent=
-        state.sound ? "🔊" : "🔇";
-
-    if(state.sound){
-        ensureAudio();
-        playClick();
-        toast("Sound system enabled.");
-    }else{
-        toast("Sound system muted.");
+    if(audioCtx.state==="suspended"){
+      audioCtx.resume().catch(()=>{});
     }
 
+    return audioCtx;
+  }catch(e){
+    return null;
+  }
 }
 
-function playTone(
-    frequency=300,
-    duration=.1,
-    type="sine",
-    volume=.04
-){
+function unlockAudio(){
+  const ctx=getAudio();
+  if(ctx){
+    try{
+      const buffer=ctx.createBuffer(1,1,22050);
+      const source=ctx.createBufferSource();
+      source.buffer=buffer;
+      source.connect(ctx.destination);
+      source.start(0);
+    }catch(e){}
+  }
+}
 
-    if(!state.sound) return;
+document.addEventListener("pointerdown",unlockAudio,{once:true});
+document.addEventListener("touchstart",unlockAudio,{once:true});
 
-    ensureAudio();
+function tone(freq=440,duration=.12,type="sine",volume=.04,delay=0){
+  if(!state.sound)return;
 
-    const ctx=state.audioCtx;
+  const ctx=getAudio();
+  if(!ctx)return;
+
+  try{
+    const now=ctx.currentTime+delay;
 
     const osc=ctx.createOscillator();
     const gain=ctx.createGain();
 
     osc.type=type;
-    osc.frequency.value=frequency;
+    osc.frequency.setValueAtTime(freq,now);
 
-    gain.gain.setValueAtTime(
-        volume,
-        ctx.currentTime
-    );
-
+    gain.gain.setValueAtTime(.0001,now);
     gain.gain.exponentialRampToValueAtTime(
-        .0001,
-        ctx.currentTime+duration
+      Math.max(.0002,volume),
+      now+.015
+    );
+    gain.gain.exponentialRampToValueAtTime(
+      .0001,
+      now+duration
     );
 
     osc.connect(gain);
     gain.connect(ctx.destination);
 
-    osc.start();
-    osc.stop(ctx.currentTime+duration);
-
+    osc.start(now);
+    osc.stop(now+duration+.04);
+  }catch(e){}
 }
 
-function playClick(){
-    playTone(420,.05,"square",.025);
-}
+function noise(duration=.18,volume=.02){
+  if(!state.sound)return;
 
-function playMeow(){
+  const ctx=getAudio();
+  if(!ctx)return;
 
-    if(!state.sound) return;
+  try{
+    const buffer=ctx.createBuffer(
+      1,
+      ctx.sampleRate*duration,
+      ctx.sampleRate
+    );
 
-    ensureAudio();
+    const data=buffer.getChannelData(0);
 
-    const ctx=state.audioCtx;
+    for(let i=0;i<data.length;i++){
+      data[i]=(Math.random()*2-1)*volume;
+    }
 
-    const osc=ctx.createOscillator();
+    const source=ctx.createBufferSource();
     const gain=ctx.createGain();
 
-    osc.type="triangle";
+    source.buffer=buffer;
+    gain.gain.value=.5;
 
-    osc.frequency.setValueAtTime(
-        430,
-        ctx.currentTime
-    );
-
-    osc.frequency.exponentialRampToValueAtTime(
-        760,
-        ctx.currentTime+.12
-    );
-
-    osc.frequency.exponentialRampToValueAtTime(
-        350,
-        ctx.currentTime+.36
-    );
-
-    gain.gain.setValueAtTime(
-        .0001,
-        ctx.currentTime
-    );
-
-    gain.gain.exponentialRampToValueAtTime(
-        .08,
-        ctx.currentTime+.04
-    );
-
-    gain.gain.exponentialRampToValueAtTime(
-        .0001,
-        ctx.currentTime+.42
-    );
-
-    osc.connect(gain);
+    source.connect(gain);
     gain.connect(ctx.destination);
 
-    osc.start();
-    osc.stop(ctx.currentTime+.45);
-
-}
-
-function playMonsterScream(){
-
-    if(!state.sound) return;
-
-    ensureAudio();
-
-    const ctx=state.audioCtx;
-
-    for(let i=0;i<4;i++){
-
-        const osc=ctx.createOscillator();
-        const gain=ctx.createGain();
-
-        osc.type=
-            i%2===0
-            ? "sawtooth"
-            : "square";
-
-        osc.frequency.setValueAtTime(
-            220+i*80,
-            ctx.currentTime
-        );
-
-        osc.frequency.exponentialRampToValueAtTime(
-            70+i*20,
-            ctx.currentTime+1.05
-        );
-
-        gain.gain.setValueAtTime(
-            .025,
-            ctx.currentTime
-        );
-
-        gain.gain.exponentialRampToValueAtTime(
-            .0001,
-            ctx.currentTime+1.1
-        );
-
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-
-        osc.start();
-        osc.stop(ctx.currentTime+1.12);
-
-    }
-
+    source.start();
+  }catch(e){}
 }
 
 /* =========================================================
-   MIND CORE
+   COMPANION ENTRY SOUNDS
    ========================================================= */
 
-function refreshMindCore(){
+function playEntrySound(id){
+  if(state.entryPlayed)return;
 
-    const s=state.stats;
+  state.entryPlayed=true;
 
-    const exploration=
-        Math.min(
-            100,
-            s.systems.length*12 +
-            s.brainRegions.length*5
-        );
+  switch(id){
 
-    const curiosity=
-        Math.min(
-            100,
-            s.rabbitDepth*7 +
-            s.systems.length*8 +
-            s.hiddenEvents*6
-        );
+    case "cat":
+      tone(610,.09,"triangle",.055);
+      setTimeout(()=>tone(430,.18,"triangle",.045),100);
+      break;
 
-    const reflection=
-        Math.min(
-            100,
-            s.letters*15 +
-            s.future*15 +
-            s.decodeSessions*18
-        );
+    case "brain":
+      tone(180,.09,"sine",.035);
+      setTimeout(()=>tone(320,.11,"sine",.03),100);
+      setTimeout(()=>tone(520,.14,"sine",.025),205);
+      break;
 
-    const chaos=
-        Math.min(
-            100,
-            25+
-            s.hiddenEvents*20+
-            s.rabbitDepth*3+
-            s.companionClicks
-        );
+    case "robot":
+      tone(240,.07,"square",.035);
+      setTimeout(()=>tone(480,.09,"square",.03),90);
+      setTimeout(()=>tone(720,.12,"square",.025),185);
+      break;
 
-    setMetric(
-        "exploration",
-        exploration
-    );
+    case "void":
+      tone(88,.5,"sine",.025);
+      setTimeout(()=>tone(125,.32,"sine",.018),170);
+      break;
 
-    setMetric(
-        "curiosity",
-        curiosity
-    );
-
-    setMetric(
-        "reflection",
-        reflection
-    );
-
-    setMetric(
-        "chaos",
-        chaos
-    );
-
-    let observation=
-        "The system is still learning your exploration pattern.";
-
-    if(s.rabbitDepth>=5){
-        observation=
-            "You keep going deeper into open-ended questions.";
-    }
-
-    if(s.future>s.letters && s.future>0){
-        observation=
-            "You've interacted with future-oriented systems more than the letter archive.";
-    }
-
-    if(s.letters>s.future && s.letters>0){
-        observation=
-            "You've preserved more unsent thoughts than future messages.";
-    }
-
-    if(s.brainRegions.length>=4){
-        observation=
-            "You have explored several different Brain Lab systems instead of staying in one region.";
-    }
-
-    document
-        .getElementById("mindObservation")
-        .textContent=observation;
-
+    case "aki":
+      tone(950,.055,"sawtooth",.025);
+      setTimeout(()=>tone(620,.08,"triangle",.04),75);
+      setTimeout(()=>tone(820,.13,"triangle",.032),155);
+      break;
+  }
 }
 
-function setMetric(name,value){
+function playClickSound(){
+  tone(460,.045,"sine",.018);
+}
 
-    document
-        .getElementById(name+"Value")
-        .textContent=
-        value+"%";
+function playSuccessSound(){
+  tone(420,.07,"triangle",.025);
+  setTimeout(()=>tone(620,.1,"triangle",.03),80);
+}
 
-    document
-        .getElementById(name+"Bar")
-        .style.width=
-        value+"%";
+function playMonsterSound(){
+  if(!state.sound)return;
 
+  tone(75,.22,"sawtooth",.045);
+  setTimeout(()=>tone(52,.28,"sawtooth",.04),150);
+  setTimeout(()=>noise(.28,.018),280);
 }
 
 /* =========================================================
-   DECODE
+   GUIDE RENDERING
    ========================================================= */
 
-const decodeQuestions=[
-
-    {
-        q:"When your brain finally gets quiet, what usually happens next?",
-        options:[
-            ["quiet","It actually stays quiet."],
-            ["thought","Another thought immediately appears."],
-            ["memory","Something random from the past shows up."],
-            ["future","My brain invents tomorrow's problem early."]
-        ]
-    },
-
-    {
-        q:"When something bothers you, what do you usually do first?",
-        options:[
-            ["analyze","Try to understand exactly why."],
-            ["avoid","Distract myself for a while."],
-            ["talk","Talk it through with someone."],
-            ["loop","Replay it repeatedly in my head."]
-        ]
-    },
-
-    {
-        q:"Which pulls your attention most easily?",
-        options:[
-            ["curiosity","Something new or interesting."],
-            ["pressure","Something urgent."],
-            ["people","What other people might think."],
-            ["future","What could happen next."]
-        ]
-    },
-
-    {
-        q:"When you imagine your future, it feels most like...",
-        options:[
-            ["map","A plan I want to build."],
-            ["fog","A giant question mark."],
-            ["movie","Scenes I keep imagining."],
-            ["pressure","A deadline that hasn't happened yet."]
-        ]
-    },
-
-    {
-        q:"If your thoughts were a room right now, what would it look like?",
-        options:[
-            ["library","A messy library."],
-            ["station","A crowded railway station."],
-            ["lab","A laboratory with unfinished experiments."],
-            ["window","A quiet room with one open window."]
-        ]
-    }
-
-];
-
-let decodeIndex=0;
-
-function renderDecode(){
-
-    const host=
-        document.getElementById("decodeQuestion");
-
-    if(!host) return;
-
-    document
-        .getElementById("decodeProgress")
-        .textContent=
-        decodeIndex < decodeQuestions.length
-        ? `QUESTION ${decodeIndex+1} / ${decodeQuestions.length}`
-        : "PATTERN GENERATED";
-
-    if(decodeIndex>=decodeQuestions.length){
-
-        showDecodeResult();
-        return;
-
-    }
-
-    const item=
-        decodeQuestions[decodeIndex];
-
-    host.innerHTML=`
-        <div class="question">
-            ${item.q}
-        </div>
-
-        <div style="margin-top:25px">
-            ${
-                item.options.map(
-                    ([value,label])=>
-                    `<button
-                        class="decode-option"
-                        onclick="answerDecode('${value}')">
-                        ${label}
-                    </button>`
-                ).join("")
-            }
-        </div>
-    `;
-
+function guide(){
+  return GUIDES[state.companion]||GUIDES.cat;
 }
 
-function answerDecode(value){
+function updateCompanion(){
+  const g=guide();
 
-    state.decodeAnswers.push(value);
+  companionBody.textContent=g.icon;
 
-    decodeIndex++;
+  companionBody.setAttribute(
+    "aria-label",
+    state.companionName || g.name
+  );
 
-    renderDecode();
+  $("coreGuide").textContent=state.companionName || g.name;
+  $("statGuide").textContent=state.companionName || g.name;
+  $("statGuideText").textContent=g.title;
 
-    if(decodeIndex===decodeQuestions.length){
+  companionBody.classList.remove("sword-swing","guide-bounce");
+  void companionBody.offsetWidth;
 
-        state.stats.decodeSessions++;
-        saveStats();
-
-        unlock("decoded");
-
-        companionSay(
-            companionLines("decode")
-        );
-
-    }
-
+  if(state.companion==="aki"){
+    companionBody.classList.add("sword-swing");
+  }else{
+    companionBody.classList.add("guide-bounce");
+  }
 }
 
-function showDecodeResult(){
+function guideSay(text=null){
+  const g=guide();
 
-    const a=state.decodeAnswers;
+  const message=text ||
+    g.reactions[Math.floor(Math.random()*g.reactions.length)];
 
-    const counts={};
+  companionDialogue.textContent=message;
+  companionDialogue.classList.add("show");
 
-    a.forEach(x=>{
-        counts[x]=(counts[x]||0)+1;
-    });
+  clearTimeout(guideSay.timer);
 
-    let headline=
-        "EXPLORATORY PATTERN";
+  guideSay.timer=setTimeout(()=>{
+    companionDialogue.classList.remove("show");
+  },3200);
 
-    let body=
-        "Your responses were spread across several styles. You may switch between reflection, curiosity and future-oriented thinking depending on context.";
-
-    if(
-        a.includes("loop") ||
-        a.filter(x=>x==="thought").length>0
-    ){
-        headline=
-            "CONTINUOUS THOUGHT PATTERN";
-
-        body=
-            "Several answers leaned toward thoughts continuing or returning. That doesn't identify a condition — it simply reflects how you answered this session.";
-    }
-
-    if(
-        a.filter(
-            x=>["future","movie","pressure","map"].includes(x)
-        ).length>=2
-    ){
-        headline=
-            "FUTURE-ORIENTED PATTERN";
-
-        body=
-            "A number of your choices pointed toward thinking ahead, imagining possibilities or planning. Consider exploring Future Me or the Brain Lab's future-thinking system.";
-    }
-
-    document
-        .getElementById("decodeQuestion")
-        .innerHTML=`
-
-        <div class="label">
-            REFLECTION RESULT
-        </div>
-
-        <div class="question">
-            ${headline}
-        </div>
-
-        <div class="decode-result">
-            ${body}
-        </div>
-
-        <br>
-
-        <button
-            class="btn primary"
-            onclick="openBrainLab()">
-            EXPLORE THIS IN BRAIN LAB
-        </button>
-
-        <button
-            class="btn"
-            onclick="resetDecode()">
-            START AGAIN
-        </button>
-    `;
-
-}
-
-function resetDecode(){
-
-    decodeIndex=0;
-    state.decodeAnswers=[];
-
-    renderDecode();
-
+  if(state.companion==="aki"){
+    companionBody.classList.remove("sword-swing");
+    void companionBody.offsetWidth;
+    companionBody.classList.add("sword-swing");
+  }else{
+    companionBody.classList.remove("guide-bounce");
+    void companionBody.offsetWidth;
+    companionBody.classList.add("guide-bounce");
+  }
 }
 
 /* =========================================================
-   BRAIN LAB
+   TOAST / ALERT
    ========================================================= */
 
-let brainInitialized=false;
-let brainAnimationStarted=false;
+let toastTimer=null;
 
-let brainRenderer=null;
-let brainScene=null;
-let brainCamera=null;
-let brainGroup=null;
+function toast(message){
+  const el=$("toast");
 
-let brainDragging=false;
-let previousPointer={x:0,y:0};
+  el.textContent=message;
+  el.classList.add("show");
 
-const brainRegions={
+  clearTimeout(toastTimer);
 
-    pfc:{
-        title:"PREFRONTAL SYSTEMS",
-        text:
-        "Frontal brain networks contribute to planning, attention, decision-making and cognitive control. Attention is distributed across multiple interacting systems rather than one single 'focus switch'."
-    },
-
-    amygdala:{
-        title:"AMYGDALA",
-        text:
-        "The amygdala contributes to processing emotionally relevant information, including cues related to threat and importance. Emotional experience involves many regions working together."
-    },
-
-    hippocampus:{
-        title:"HIPPOCAMPUS",
-        text:
-        "The hippocampus plays an important role in forming and organizing memories and in learning relationships between experiences."
-    },
-
-    dmn:{
-        title:"DEFAULT MODE NETWORK",
-        text:
-        "The default mode network is associated with internally focused thought such as remembering, imagining, considering yourself or others, and spontaneous thought."
-    },
-
-    future:{
-        title:"FUTURE-ORIENTED THINKING",
-        text:
-        "Imagining the future doesn't belong to one brain region. It recruits interacting systems involved in memory, planning, valuation and imagination."
-    },
-
-    all:{
-        title:"WHOLE SYSTEM",
-        text:
-        "Brains work through distributed networks. Individual regions matter, but most everyday experiences emerge from many systems interacting together."
-    }
-
-};
-
-function openBrainLab(){
-
-    document.body.classList.add("brain-open");
-
-    trackSystem("brain");
-
-    companionSay(
-        companionLines("brain")
-    );
-
-    initBrain();
-
+  toastTimer=setTimeout(()=>{
+    el.classList.remove("show");
+  },3000);
 }
 
-function closeBrainLab(){
+function alertSystem(title,text){
+  $("alertTitle").textContent=title;
+  $("alertText").textContent=text;
 
-    document.body.classList.remove("brain-open");
+  const el=$("systemAlert");
+  el.classList.add("show");
 
-}
-
-function initBrain(){
-
-    if(brainInitialized){
-        resizeBrain();
-        return;
-    }
-
-    const host=
-        document.getElementById("brainCanvas");
-
-    const fallback=
-        document.getElementById("brainFallback");
-
-    try{
-
-        if(!window.THREE){
-            throw new Error("THREE unavailable");
-        }
-
-        brainScene=
-            new THREE.Scene();
-
-        brainCamera=
-            new THREE.PerspectiveCamera(
-                45,
-                host.clientWidth/host.clientHeight,
-                .1,
-                100
-            );
-
-        brainCamera.position.z=7;
-
-        brainRenderer=
-            new THREE.WebGLRenderer({
-                antialias:true,
-                alpha:true
-            });
-
-        brainRenderer.setPixelRatio(
-            Math.min(window.devicePixelRatio,2)
-        );
-
-        brainRenderer.setSize(
-            host.clientWidth,
-            host.clientHeight
-        );
-
-        host.appendChild(
-            brainRenderer.domElement
-        );
-
-        brainGroup=
-            new THREE.Group();
-
-        brainScene.add(brainGroup);
-
-        createBrainParticles();
-        createNeuralConnections();
-
-        brainInitialized=true;
-
-        bindBrainControls();
-
-        if(!brainAnimationStarted){
-            brainAnimationStarted=true;
-            animateBrain();
-        }
-
-    }catch(err){
-
-        console.warn(
-            "Brain WebGL fallback:",
-            err
-        );
-
-        fallback.style.display="block";
-
-        drawFallbackBrain();
-
-    }
-
-}
-
-function createBrainParticles(){
-
-    const count=
-        window.innerWidth<700
-        ? 3500
-        : 7000;
-
-    const positions=
-        new Float32Array(count*3);
-
-    for(let i=0;i<count;i++){
-
-        let x,y,z;
-
-        // produce two lobed ellipsoid-like structure
-        const side=
-            Math.random()<.5
-            ? -1
-            : 1;
-
-        const theta=
-            Math.random()*Math.PI*2;
-
-        const phi=
-            Math.acos(
-                2*Math.random()-1
-            );
-
-        const r=
-            .55+
-            Math.random()*.48;
-
-        x=
-            side*.52+
-            Math.sin(phi)*
-            Math.cos(theta)*
-            1.15*r;
-
-        y=
-            Math.cos(phi)*
-            1.28*r;
-
-        z=
-            Math.sin(phi)*
-            Math.sin(theta)*
-            .9*r;
-
-        // narrow lower region
-        if(y < -.72){
-            x*=.72;
-        }
-
-        positions[i*3]=x;
-        positions[i*3+1]=y;
-        positions[i*3+2]=z;
-
-    }
-
-    const geometry=
-        new THREE.BufferGeometry();
-
-    geometry.setAttribute(
-        "position",
-        new THREE.BufferAttribute(
-            positions,
-            3
-        )
-    );
-
-    const material=
-        new THREE.PointsMaterial({
-            color:0xb7d4c0,
-            size:.018,
-            transparent:true,
-            opacity:.76
-        });
-
-    const points=
-        new THREE.Points(
-            geometry,
-            material
-        );
-
-    brainGroup.add(points);
-
-}
-
-function createNeuralConnections(){
-
-    const material=
-        new THREE.LineBasicMaterial({
-            color:0x466052,
-            transparent:true,
-            opacity:.16
-        });
-
-    for(let i=0;i<75;i++){
-
-        const points=[];
-
-        const a=
-            randomBrainPoint();
-
-        const b=
-            randomBrainPoint();
-
-        points.push(
-            new THREE.Vector3(
-                a.x,a.y,a.z
-            )
-        );
-
-        points.push(
-            new THREE.Vector3(
-                b.x,b.y,b.z
-            )
-        );
-
-        const geometry=
-            new THREE.BufferGeometry()
-            .setFromPoints(points);
-
-        brainGroup.add(
-            new THREE.Line(
-                geometry,
-                material
-            )
-        );
-
-    }
-
-}
-
-function randomBrainPoint(){
-
-    return{
-        x:(Math.random()-.5)*2.2,
-        y:(Math.random()-.5)*2.2,
-        z:(Math.random()-.5)*1.5
-    };
-
-}
-
-function bindBrainControls(){
-
-    const canvas=
-        brainRenderer.domElement;
-
-    canvas.addEventListener(
-        "pointerdown",
-        e=>{
-            brainDragging=true;
-            previousPointer={
-                x:e.clientX,
-                y:e.clientY
-            };
-        }
-    );
-
-    window.addEventListener(
-        "pointerup",
-        ()=>{
-            brainDragging=false;
-        }
-    );
-
-    window.addEventListener(
-        "pointermove",
-        e=>{
-
-            if(!brainDragging) return;
-
-            const dx=
-                e.clientX-
-                previousPointer.x;
-
-            const dy=
-                e.clientY-
-                previousPointer.y;
-
-            brainGroup.rotation.y +=
-                dx*.008;
-
-            brainGroup.rotation.x +=
-                dy*.008;
-
-            previousPointer={
-                x:e.clientX,
-                y:e.clientY
-            };
-
-        }
-    );
-
-    canvas.addEventListener(
-        "wheel",
-        e=>{
-
-            e.preventDefault();
-
-            brainCamera.position.z +=
-                e.deltaY*.003;
-
-            brainCamera.position.z=
-                Math.max(
-                    3.7,
-                    Math.min(
-                        10,
-                        brainCamera.position.z
-                    )
-                );
-
-        },
-        {passive:false}
-    );
-
-    canvas.addEventListener(
-        "click",
-        ()=>{
-
-            const keys=
-                Object.keys(brainRegions);
-
-            selectBrainRegion(
-                keys[
-                    Math.floor(
-                        Math.random()*keys.length
-                    )
-                ]
-            );
-
-        }
-    );
-
-}
-
-function animateBrain(){
-
-    requestAnimationFrame(
-        animateBrain
-    );
-
-    if(
-        brainGroup &&
-        !brainDragging
-    ){
-
-        brainGroup.rotation.y += .0016;
-
-    }
-
-    if(
-        brainRenderer &&
-        brainScene &&
-        brainCamera
-    ){
-
-        brainRenderer.render(
-            brainScene,
-            brainCamera
-        );
-
-    }
-
-}
-
-function resizeBrain(){
-
-    const host=
-        document.getElementById("brainCanvas");
-
-    if(
-        !brainRenderer ||
-        !brainCamera ||
-        !host.clientWidth ||
-        !host.clientHeight
-    ) return;
-
-    brainCamera.aspect=
-        host.clientWidth/
-        host.clientHeight;
-
-    brainCamera.updateProjectionMatrix();
-
-    brainRenderer.setSize(
-        host.clientWidth,
-        host.clientHeight
-    );
-
-}
-
-window.addEventListener(
-    "resize",
-    resizeBrain
-);
-
-function selectBrainRegion(region){
-
-    const info=
-        brainRegions[region] ||
-        brainRegions.all;
-
-    document
-        .getElementById("brainRegionTitle")
-        .textContent=
-        info.title;
-
-    document
-        .getElementById("brainRegionText")
-        .textContent=
-        info.text;
-
-    if(
-        !state.stats.brainRegions.includes(region)
-    ){
-
-        state.stats.brainRegions.push(region);
-
-        saveStats();
-
-        unlock("brain");
-
-    }
-
-    if(brainGroup){
-
-        const rotations={
-            pfc:[-.05,.5],
-            dmn:[.18,-.5],
-            amygdala:[.08,1.2],
-            hippocampus:[-.18,-1],
-            future:[.1,.2],
-            all:[0,0]
-        };
-
-        const r=
-            rotations[region] ||
-            [0,0];
-
-        brainGroup.rotation.x=r[0];
-        brainGroup.rotation.y=r[1];
-
-    }
-
-    companionSay(
-        companionLines("brain")
-    );
-
-    refreshMindCore();
-    renderStats();
-
-}
-
-function drawFallbackBrain(){
-
-    const canvas=
-        document.getElementById("brainFallback");
-
-    const ctx=
-        canvas.getContext("2d");
-
-    function draw(){
-
-        canvas.width=
-            canvas.clientWidth*
-            devicePixelRatio;
-
-        canvas.height=
-            canvas.clientHeight*
-            devicePixelRatio;
-
-        ctx.clearRect(
-            0,
-            0,
-            canvas.width,
-            canvas.height
-        );
-
-        const cx=
-            canvas.width/2;
-
-        const cy=
-            canvas.height/2;
-
-        ctx.strokeStyle=
-            "rgba(190,230,200,.65)";
-
-        ctx.lineWidth=
-            1*devicePixelRatio;
-
-        ctx.beginPath();
-
-        ctx.ellipse(
-            cx,
-            cy,
-            canvas.width*.19,
-            canvas.height*.27,
-            -.08,
-            0,
-            Math.PI*2
-        );
-
-        ctx.stroke();
-
-        for(let i=0;i<110;i++){
-
-            const angle=
-                Math.random()*
-                Math.PI*2;
-
-            const rx=
-                Math.random()*
-                canvas.width*.18;
-
-            const ry=
-                Math.random()*
-                canvas.height*.26;
-
-            const x=
-                cx+
-                Math.cos(angle)*rx;
-
-            const y=
-                cy+
-                Math.sin(angle)*ry;
-
-            ctx.fillStyle=
-                "rgba(175,215,185,.45)";
-
-            ctx.fillRect(
-                x,
-                y,
-                2*devicePixelRatio,
-                2*devicePixelRatio
-            );
-
-        }
-
-        ctx.fillStyle=
-            "rgba(140,160,150,.7)";
-
-        ctx.font=
-            `${12*devicePixelRatio}px monospace`;
-
-        ctx.textAlign="center";
-
-        ctx.fillText(
-            "2D FALLBACK MODE",
-            cx,
-            canvas.height*.84
-        );
-
-    }
-
-    draw();
-
-    window.addEventListener(
-        "resize",
-        draw
-    );
-
-}
-
-/* =========================================================
-   RABBIT HOLE
-   ========================================================= */
-
-const rabbitPrompts=[
-
-    "If your future self could delete one fear from your brain, which one would disappear?",
-
-    "Which version of you exists only because somebody once believed in you?",
-
-    "If nobody could ever compare you to anyone else, what would success mean?",
-
-    "What do you know about yourself now that you didn't know one year ago?",
-
-    "Would you rather know exactly where your life is going or keep the ability to surprise yourself?",
-
-    "Which memory would you preserve if your brain could keep only one ordinary day?",
-
-    "What is something you've changed your mind about recently?",
-
-    "If curiosity had no consequences, what would you investigate tonight?",
-
-    "DEPTH WARNING: You were supposed to stop several questions ago.",
-
-    "What would you attempt if failure couldn't embarrass you?",
-
-    "If your thoughts left footprints, where would they keep walking back to?",
-
-    "What part of your future feels most real even though it hasn't happened yet?"
-
-];
-
-function goDeeper(){
-
-    state.rabbitDepth++;
-
-    localStorage.setItem(
-        STORE.rabbit,
-        state.rabbitDepth
-    );
-
-    state.stats.rabbitDepth=
-        Math.max(
-            state.stats.rabbitDepth,
-            state.rabbitDepth
-        );
-
-    saveStats();
-
-    document
-        .getElementById("rabbitDepth")
-        .textContent=
-        "DEPTH // "+
-        String(state.rabbitDepth)
-        .padStart(2,"0");
-
-    document
-        .getElementById("rabbitPrompt")
-        .textContent=
-        rabbitPrompts[
-            (state.rabbitDepth-1)%
-            rabbitPrompts.length
-        ];
-
-    companionSay(
-        companionLines("rabbit")
-    );
-
-    if(state.rabbitDepth>=3){
-        unlock("rabbit");
-    }
-
-    if(state.rabbitDepth>=5){
-        unlock("deepdive");
-    }
-
-    if(
-        state.rabbitDepth===7
-    ){
-
-        showSystemAlert(
-            "You were supposed to stop three levels ago."
-        );
-
-    }
-
-    if(
-        state.rabbitDepth>=8 &&
-        Math.random()<.12
-    ){
-
-        triggerMonster();
-
-    }
-
-    refreshMindCore();
-    renderStats();
-
-}
-
-function resetRabbit(){
-
-    state.rabbitDepth=0;
-
-    localStorage.setItem(
-        STORE.rabbit,
-        "0"
-    );
-
-    document
-        .getElementById("rabbitDepth")
-        .textContent=
-        "DEPTH // 00";
-
-    document
-        .getElementById("rabbitPrompt")
-        .textContent=
-        "You escaped. Probably.";
-
-}
-
-/* =========================================================
-   FUTURE
-   ========================================================= */
-
-function loadDrafts(){
-
-    const drafts=
-        readJSON(
-            STORE.draft,
-            {}
-        );
-
-    document
-        .getElementById("futureText")
-        .value=
-        drafts.future || "";
-
-    document
-        .getElementById("letterText")
-        .value=
-        drafts.letter || "";
-
-    document
-        .getElementById("parentMessage")
-        .value=
-        drafts.parent || "";
-
-}
-
-function updateDraft(name,value){
-
-    const drafts=
-        readJSON(
-            STORE.draft,
-            {}
-        );
-
-    drafts[name]=value;
-
-    saveJSON(
-        STORE.draft,
-        drafts
-    );
-
-}
-
-document.addEventListener(
-    "input",
-    e=>{
-
-        if(e.target.id==="futureText"){
-            updateDraft(
-                "future",
-                e.target.value
-            );
-        }
-
-        if(e.target.id==="letterText"){
-            updateDraft(
-                "letter",
-                e.target.value
-            );
-        }
-
-        if(e.target.id==="parentMessage"){
-            updateDraft(
-                "parent",
-                e.target.value
-            );
-        }
-
-    }
-);
-
-function clearDraft(name){
-
-    const drafts=
-        readJSON(
-            STORE.draft,
-            {}
-        );
-
-    drafts[name]="";
-
-    saveJSON(
-        STORE.draft,
-        drafts
-    );
-
-}
-
-function clearFutureDraft(){
-
-    document
-        .getElementById("futureText")
-        .value="";
-
-    clearDraft("future");
-
-}
-
-function saveFuture(){
-
-    const text=
-        document
-        .getElementById("futureText")
-        .value
-        .trim();
-
-    if(!text){
-        toast("Write something first.");
-        return;
-    }
-
-    const delay=
-        Number(
-            document
-            .getElementById("futureDelay")
-            .value
-        );
-
-    const now=
-        Date.now();
-
-    const list=
-        readJSON(
-            STORE.future,
-            []
-        );
-
-    list.unshift({
-        id:now,
-        text,
-        created:now,
-        unlock:
-            now+
-            delay*
-            24*60*60*1000
-    });
-
-    saveJSON(
-        STORE.future,
-        list
-    );
-
-    state.stats.future++;
-
-    saveStats();
-
-    clearFutureDraft();
-
-    renderFuture();
-
-    unlock("future");
-
-    companionSay(
-        companionLines("future")
-    );
-
-    toast("Time capsule sealed.");
-
-}
-
-function renderFuture(){
-
-    const host=
-        document.getElementById("futureList");
-
-    if(!host) return;
-
-    const list=
-        readJSON(
-            STORE.future,
-            []
-        );
-
-    if(!list.length){
-
-        host.innerHTML=
-            `<p class="muted small">
-                No capsules yet.
-            </p>`;
-
-        return;
-    }
-
-    host.innerHTML=
-        list.map(item=>{
-
-            const unlocked=
-                Date.now()>=item.unlock;
-
-            return`
-
-            <div class="archive-item">
-
-                <div class="archive-date">
-                    CREATED //
-                    ${
-                        new Date(item.created)
-                        .toLocaleDateString()
-                    }
-                </div>
-
-                <strong>
-                    ${
-                        unlocked
-                        ? "DELIVERY COMPLETE"
-                        : "CAPSULE LOCKED"
-                    }
-                </strong>
-
-                <div
-                    class="muted small"
-                    style="margin-top:8px">
-
-                    ${
-                        unlocked
-                        ? escapeHTML(item.text)
-                        : "Unlocks "+
-                          new Date(item.unlock)
-                          .toLocaleDateString()
-                    }
-
-                </div>
-
-            </div>
-
-            `;
-
-        }).join("");
-
-}
-
-/* =========================================================
-   LETTERS
-   ========================================================= */
-
-function clearLetterDraft(){
-
-    document
-        .getElementById("letterText")
-        .value="";
-
-    clearDraft("letter");
-
-}
-
-function saveLetter(){
-
-    const text=
-        document
-        .getElementById("letterText")
-        .value
-        .trim();
-
-    if(!text){
-
-        toast(
-            "The letter is currently very unsaid."
-        );
-
-        return;
-    }
-
-    const to=
-        document
-        .getElementById("letterTo")
-        .value;
-
-    const list=
-        readJSON(
-            STORE.letters,
-            []
-        );
-
-    list.unshift({
-        id:Date.now(),
-        to,
-        text,
-        date:Date.now()
-    });
-
-    saveJSON(
-        STORE.letters,
-        list
-    );
-
-    state.stats.letters++;
-
-    saveStats();
-
-    clearLetterDraft();
-
-    renderLetters();
-
-    unlock("letter");
-
-    companionSay(
-        companionLines("letter")
-    );
-
-    toast(
-        "Letter preserved locally."
-    );
-
-}
-
-function renderLetters(){
-
-    const host=
-        document.getElementById("letterList");
-
-    if(!host) return;
-
-    const list=
-        readJSON(
-            STORE.letters,
-            []
-        );
-
-    if(!list.length){
-
-        host.innerHTML=
-            `<p class="muted small">
-                The archive is empty.
-            </p>`;
-
-        return;
-    }
-
-    host.innerHTML=
-        list.map(item=>`
-
-        <div class="archive-item">
-
-            <div class="archive-date">
-                ${new Date(item.date).toLocaleDateString()}
-            </div>
-
-            <strong>
-                TO // ${escapeHTML(item.to)}
-            </strong>
-
-            <div
-                class="muted small"
-                style="margin-top:8px">
-                ${escapeHTML(item.text)}
-            </div>
-
-        </div>
-
-        `).join("");
-
-}
-
-/* =========================================================
-   PARENT.EXE
-   ========================================================= */
-
-function sendParentMessage(){
-
-    const text=
-        document
-        .getElementById("parentMessage")
-        .value
-        .trim();
-
-    if(!text){
-
-        toast(
-            "Type the message first."
-        );
-
-        return;
-    }
-
-    const convo=
-        readJSON(
-            STORE.parent,
-            []
-        );
-
-    convo.push({
-        type:"user",
-        text,
-        date:Date.now()
-    });
-
-    saveJSON(
-        STORE.parent,
-        convo
-    );
-
-    updateDraft(
-        "parent",
-        ""
-    );
-
-    document
-        .getElementById("parentMessage")
-        .value="";
-
-    renderParent();
-
-    toast(
-        "Message added to local practice conversation."
-    );
-
-}
-
-function generateParentPerspective(){
-
-    const convo=
-        readJSON(
-            STORE.parent,
-            []
-        );
-
-    const last=
-        [...convo]
-        .reverse()
-        .find(
-            x=>x.type==="user"
-        );
-
-    if(!last){
-
-        toast(
-            "Send a message to the simulation first."
-        );
-
-        return;
-    }
-
-    const text=
-        last.text.toLowerCase();
-
-    let response=
-        "I may not fully understand this yet, but I would want you to explain what you're experiencing and what kind of support would actually help.";
-
-    if(
-        text.includes("pressure") ||
-        text.includes("study") ||
-        text.includes("marks") ||
-        text.includes("exam")
-    ){
-
-        response=
-            "I might initially focus on studies because I care about your future, but hearing how the pressure is affecting you would help me understand that support may matter more than simply telling you to work harder.";
-
-    }else if(
-        text.includes("scared") ||
-        text.includes("afraid") ||
-        text.includes("worry")
-    ){
-
-        response=
-            "I may not know exactly how to fix what you're worried about, but I can listen first instead of immediately trying to solve it.";
-
-    }else if(
-        text.includes("sorry")
-    ){
-
-        response=
-            "You don't have to explain everything perfectly. I would rather understand what happened and what you need now than only hear an apology.";
-
-    }
-
-    state.pendingParentResponse=
-        response;
-
-    toast(
-        "Practice response generated. Press READ RESPONSE."
-    );
-
-}
-
-function readParentResponse(){
-
-    if(!state.pendingParentResponse){
-
-        toast(
-            "Generate a practice response first."
-        );
-
-        return;
-    }
-
-    const convo=
-        readJSON(
-            STORE.parent,
-            []
-        );
-
-    convo.push({
-        type:"simulation",
-        text:state.pendingParentResponse,
-        date:Date.now()
-    });
-
-    saveJSON(
-        STORE.parent,
-        convo
-    );
-
-    state.pendingParentResponse="";
-
-    renderParent();
-
-}
-
-function renderParent(){
-
-    const host=
-        document.getElementById("parentConversation");
-
-    if(!host) return;
-
-    const convo=
-        readJSON(
-            STORE.parent,
-            []
-        );
-
-    if(!convo.length){
-
-        host.innerHTML=
-            "Nothing here yet.";
-
-        return;
-    }
-
-    host.innerHTML=
-        convo.map(item=>`
-
-        <div class="archive-item">
-
-            <div class="archive-date">
-                ${
-                    item.type==="user"
-                    ? "YOU"
-                    : "PRACTICE PERSPECTIVE"
-                }
-            </div>
-
-            <div style="margin-top:7px">
-                ${escapeHTML(item.text)}
-            </div>
-
-        </div>
-
-        `).join("");
-
+  setTimeout(()=>el.classList.remove("show"),3800);
 }
 
 /* =========================================================
    ACHIEVEMENTS
    ========================================================= */
 
-const achievementDefinitions=[
-
-    {
-        id:"explorer",
-        name:"SYSTEM EXPLORER",
-        desc:"Explore your first system."
-    },
-
-    {
-        id:"brain",
-        name:"BRAIN CARTOGRAPHER",
-        desc:"Investigate a Brain Lab system."
-    },
-
-    {
-        id:"rabbit",
-        name:"2AM PHILOSOPHER",
-        desc:"Reach Rabbit Hole depth 3."
-    },
-
-    {
-        id:"letter",
-        name:"UNSENT",
-        desc:"Preserve an unsaid letter."
-    },
-
-    {
-        id:"future",
-        name:"TIME CAPSULE",
-        desc:"Send something to Future You."
-    },
-
-    {
-        id:"map",
-        name:"DATA GREMLIN",
-        desc:"Build interaction data in MIND // CORE."
-    },
-
-    {
-        id:"sword",
-        name:"WOODEN SWORD PROTOCOL",
-        desc:"A relic from AKI.exe."
-    },
-
-    {
-        id:"unknown",
-        name:"UNKNOWN PROCESS",
-        desc:"Find something that shouldn't exist."
-    },
-
-    {
-        id:"decoded",
-        name:"NO THOUGHT LEFT BEHIND",
-        desc:"Complete Decode My Brain."
-    },
-
-    {
-        id:"catwhisperer",
-        name:"CAT WHISPERER",
-        desc:"Poke the cat an unreasonable number of times."
-    },
-
-    {
-        id:"deepdive",
-        name:"DEEP DIVE",
-        desc:"Reach Rabbit Hole depth 5."
-    },
-
-    {
-        id:"anomaly",
-        name:"SYSTEM ANOMALY",
-        desc:"Witness a hidden event."
-    }
-
+const ACHIEVEMENTS=[
+  ["explorer","SYSTEM EXPLORER","Explore five systems.","🧭"],
+  ["brain","BRAIN CARTOGRAPHER","Open the Brain Lab.","🧠"],
+  ["rabbit","2AM PHILOSOPHER","Go five levels deep.","🐇"],
+  ["letter","UNSENT","Archive a letter.","✉️"],
+  ["future","TIME CAPSULE","Store a future transmission.","⏳"],
+  ["map","DATA GREMLIN","Explore the Mind Core.","📡"],
+  ["sword","WOODEN SWORD PROTOCOL","Use the AKI guide.","🎌"],
+  ["unknown","UNKNOWN PROCESS","Discover the hidden event.","◢"],
+  ["guide","GUIDE SWITCH","Change your guide.","⚙"],
+  ["decode","PATTERN DETECTIVE","Complete Decode My Brain.","🔎"]
 ];
 
-function getAchievements(){
-
-    return readJSON(
-        STORE.achievements,
-        []
-    );
-
+function unlocked(id){
+  return state.achievements.includes(id);
 }
 
 function unlock(id){
+  if(unlocked(id))return;
 
-    const list=
-        getAchievements();
+  state.achievements.push(id);
+  safeSet(STORE.achievements,state.achievements);
 
-    if(list.includes(id)) return;
+  renderAchievements();
 
-    list.push(id);
+  const item=ACHIEVEMENTS.find(x=>x[0]===id);
 
-    saveJSON(
-        STORE.achievements,
-        list
-    );
-
-    const def=
-        achievementDefinitions
-        .find(x=>x.id===id);
-
-    if(def){
-
-        toast(
-            `ACHIEVEMENT // ${def.name}`
-        );
-
-    }
-
-    renderAchievements();
-
+  if(item){
+    toast("ACHIEVEMENT UNLOCKED // "+item[3]+" "+item[1]);
+    playSuccessSound();
+  }
 }
 
 function renderAchievements(){
-
-    const host=
-        document.getElementById("achievementGrid");
-
-    if(!host) return;
-
-    const unlocked=
-        getAchievements();
-
-    host.innerHTML=
-        achievementDefinitions.map(a=>`
-
-        <div class="
-            achievement
-            ${
-                unlocked.includes(a.id)
-                ? "unlocked"
-                : ""
-            }">
-
-            <div class="label">
-                ${
-                    unlocked.includes(a.id)
-                    ? "UNLOCKED"
-                    : "LOCKED"
-                }
-            </div>
-
-            <div class="achievement-name">
-                ${
-                    unlocked.includes(a.id)
-                    ? a.name
-                    : "????????"
-                }
-            </div>
-
-            <div class="muted small">
-                ${
-                    unlocked.includes(a.id)
-                    ? a.desc
-                    : "Keep exploring."
-                }
-            </div>
-
-        </div>
-
-        `).join("");
-
+  $("achievementGrid").innerHTML=ACHIEVEMENTS.map(a=>`
+    <div class="achievement ${unlocked(a[0])?"unlocked":""}">
+      <div style="font-size:1.6rem">${unlocked(a[0])?a[3]:"?"}</div>
+      <div class="achievement-name">${a[1]}</div>
+      <div class="muted small">${a[2]}</div>
+    </div>
+  `).join("");
 }
 
 /* =========================================================
-   OBSERVATORY / ECHOES
+   STATS
    ========================================================= */
-
-function renderStats(){
-
-    const host=
-        document.getElementById("statsOutput");
-
-    if(!host) return;
-
-    const s=state.stats;
-
-    host.innerHTML=`
-
-        SYSTEMS EXPLORED
-        <strong style="float:right">
-            ${s.systems.length}
-        </strong>
-        <br>
-
-        BRAIN REGIONS
-        <strong style="float:right">
-            ${s.brainRegions.length}
-        </strong>
-        <br>
-
-        RABBIT HOLE DEPTH
-        <strong style="float:right">
-            ${s.rabbitDepth}
-        </strong>
-        <br>
-
-        LETTERS WRITTEN
-        <strong style="float:right">
-            ${s.letters}
-        </strong>
-        <br>
-
-        FUTURE CAPSULES
-        <strong style="float:right">
-            ${s.future}
-        </strong>
-        <br>
-
-        HIDDEN EVENTS
-        <strong style="float:right">
-            ${s.hiddenEvents}
-        </strong>
-        <br>
-
-        VISITS
-        <strong style="float:right">
-            ${s.visits}
-        </strong>
-
-    `;
-
-    generateEcho();
-
-}
-
-function generateEcho(){
-
-    const host=
-        document.getElementById("echoOutput");
-
-    if(!host) return;
-
-    const s=state.stats;
-
-    let echo=
-        "Not enough information yet. Keep exploring.";
-
-    if(
-        s.future>0 &&
-        s.brainRegions.includes("future")
-    ){
-
-        echo=
-            "ECHO DETECTED // You explored future-oriented thinking in the Brain Lab and also created a message for your future self.";
-
-    }else if(
-        s.rabbitDepth>=5
-    ){
-
-        echo=
-            `ECHO DETECTED // You reached Rabbit Hole depth ${s.rabbitDepth}. Curiosity appears repeatedly in your interaction history.`;
-
-    }else if(
-        s.letters>=2
-    ){
-
-        echo=
-            "ECHO DETECTED // You have returned to the Unsaid Letters archive more than once. Some thoughts apparently deserve somewhere to exist even when they aren't sent.";
-
-    }else if(
-        s.brainRegions.length>=3
-    ){
-
-        echo=
-            "ECHO DETECTED // You explored several different Brain Lab systems rather than staying with one topic.";
-
-    }
-
-    host.textContent=echo;
-
-}
 
 function saveStats(){
+  safeSet(STORE.stats,state.stats);
+}
 
-    saveJSON(
-        STORE.v4Stats,
-        state.stats
-    );
+function activity(type="explore"){
+  state.stats.explorations++;
 
+  if(type==="reflect")state.stats.reflections++;
+  if(type==="curious")state.stats.curiosity++;
+
+  saveStats();
+  updateStats();
+}
+
+function updateStats(){
+  const s=state.stats;
+
+  $("statSessions").textContent=s.sessions;
+  $("statExplorations").textContent=s.explorations;
+  $("statArchives").textContent=s.archives;
+
+  const exp=Math.min(100,s.explorations*7);
+  const ref=Math.min(100,s.reflections*12);
+  const cur=Math.min(100,s.curiosity*10);
+
+  $("metricExplore").style.width=exp+"%";
+  $("metricExploreText").textContent=exp+"%";
+
+  $("metricReflect").style.width=ref+"%";
+  $("metricReflectText").textContent=ref+"%";
+
+  $("metricCurious").style.width=cur+"%";
+  $("metricCuriousText").textContent=cur+"%";
+
+  const age=Math.max(
+    0,
+    Math.floor((Date.now()-s.firstOpen)/86400000)
+  );
+
+  $("statAge").textContent=age+" day"+(age===1?"":"s");
+
+  if(exp===0){
+    $("coreObservation").textContent=
+      "System waiting for observations.";
+  }else if(exp<30){
+    $("coreObservation").textContent=
+      "The system has started collecting activity signals.";
+  }else if(ref>40){
+    $("coreObservation").textContent=
+      "Reflection activity is becoming one of the stronger signals.";
+  }else{
+    $("coreObservation").textContent=
+      "Curiosity is currently driving the system.";
+  }
 }
 
 /* =========================================================
-   UNKNOWN PROCESS
+   BOOT
    ========================================================= */
 
-function maybeRandomEvent(){
+const bootLines=[
+  "loading local memory...",
+  "checking existing fragments...",
+  "mounting thought archive...",
+  "initializing companion protocol...",
+  "checking brain lab...",
+  "opening UNSAID..."
+];
 
-    if(Math.random()<.28){
+function bootSequence(){
+  const log=$("bootLog");
+  const bar=$("bootProgress");
 
-        const events=[
-            "unknown_process briefly accessed companion memory.",
-            "An unlabelled file appeared and disappeared.",
-            "WHO IS STUDYING WHO?",
-            "COMPANION PROCESS IS NOT ALONE.",
-            "...did you hear that?"
-        ];
+  let i=0;
 
-        showSystemAlert(
-            events[
-                Math.floor(
-                    Math.random()*events.length
-                )
-            ]
-        );
+  const timer=setInterval(()=>{
+    if(i>=bootLines.length){
+      clearInterval(timer);
 
-        state.stats.hiddenEvents++;
-
-        saveStats();
-
-        unlock("anomaly");
-
+      $("bootEnter").classList.add("ready");
+      return;
     }
 
-    if(
-        Math.random()<.06
-    ){
+    const line=document.createElement("div");
+    line.textContent="> "+bootLines[i];
+    log.appendChild(line);
 
-        triggerMonster();
+    bar.style.width=
+      ((i+1)/bootLines.length*100)+"%";
 
-    }
-
-    setTimeout(
-        maybeRandomEvent,
-        25000+
-        Math.random()*45000
-    );
-
+    i++;
+  },180);
 }
 
-function showSystemAlert(text){
+function enterSystem(){
+  unlockAudio();
 
-    const alert=
-        document.getElementById("systemAlert");
+  boot.style.display="none";
 
-    document
-        .getElementById("systemAlertText")
-        .textContent=
-        text;
+  const onboarded=safeGet(STORE.onboarding,false);
 
-    alert.classList.add("show");
+  if(onboarded){
+    showApp();
+  }else{
+    onboarding.classList.remove("hidden");
+    setupOnboarding();
+  }
+}
 
+$("bootButton").addEventListener("click",enterSystem);
+
+/* =========================================================
+   ONBOARDING
+   ========================================================= */
+
+let onboardingMind=null;
+let onboardingGuide=null;
+
+function renderOnboardGuides(){
+  $("onboardGuides").innerHTML=
+    Object.entries(GUIDES).map(([id,g])=>`
+      <button class="companion-card ${onboardingGuide===id?"selected":""}" data-onboard-guide="${id}">
+        <span class="emoji">${g.icon}</span>
+        <strong>${g.name}</strong>
+        <div class="muted small">${g.title}</div>
+      </button>
+    `).join("");
+}
+
+function setupOnboarding(){
+
+  $("startOnboarding").onclick=()=>{
+    $("onboardStep1").classList.add("hidden");
+    $("onboardStep2").classList.remove("hidden");
+    unlockAudio();
+  };
+
+  document.querySelectorAll("[data-mind]").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      document.querySelectorAll("[data-mind]").forEach(x=>x.classList.remove("selected"));
+
+      btn.classList.add("selected");
+      onboardingMind=btn.dataset.mind;
+
+      $("mindNext").disabled=false;
+      playClickSound();
+    });
+  });
+
+  $("mindNext").onclick=()=>{
+    if(!onboardingMind)return;
+
+    $("onboardStep2").classList.add("hidden");
+    $("onboardStep3").classList.remove("hidden");
+
+    renderOnboardGuides();
+  };
+
+  $("onboardGuides").addEventListener("click",e=>{
+    const card=e.target.closest("[data-onboard-guide]");
+    if(!card)return;
+
+    onboardingGuide=card.dataset.onboardGuide;
+    renderOnboardGuides();
+
+    $("finishOnboarding").disabled=false;
+
+    playClickSound();
+  });
+
+  $("finishOnboarding").onclick=()=>{
+    if(!onboardingGuide)return;
+
+    state.companion=onboardingGuide;
+    state.companionName=$("customName").value.trim();
+    state.mind=onboardingMind;
+
+    safeSet(STORE.companion,state.companion);
+    safeSet(STORE.companionName,state.companionName);
+    safeSet(STORE.mind,state.mind);
+    safeSet(STORE.onboarding,true);
+
+    showApp(true);
+  };
+}
+
+/* =========================================================
+   APP OPEN
+   ========================================================= */
+
+function showApp(firstOpen=false){
+
+  onboarding.classList.add("hidden");
+  app.classList.remove("hidden");
+
+  updateCompanion();
+  updateStats();
+  renderAchievements();
+  renderFuture();
+  renderLetters();
+  renderRabbit();
+
+  loadDrafts();
+
+  setTimeout(()=>{
+    playEntrySound(state.companion);
+  },650);
+
+  if(firstOpen){
     setTimeout(()=>{
-        alert.classList.remove("show");
-    },3200);
+      openIntro();
+    },1100);
+  }else{
+    if(!safeGet(STORE.intro,false)){
+      setTimeout(openIntro,900);
+    }
+  }
 
+  if(state.companion==="aki"){
+    unlock("sword");
+  }
 }
 
-function triggerMonster(){
+/* =========================================================
+   INTRO
+   ========================================================= */
 
-    const monster=
-        document.getElementById("monster");
+const introSteps=[
+  {
+    n:"01 / START",
+    title:"THERE IS NO CORRECT WAY TO USE THIS.",
+    text:"Start anywhere. Brain Lab, Decode My Brain, Rabbit Hole, letters, Future Me, Parent.exe or the suspicious buttons."
+  },
+  {
+    n:"02 / EXPLORE",
+    title:"THE SYSTEM REMEMBERS.",
+    text:"Your saved letters, future transmissions, achievements and settings stay in local browser storage."
+  },
+  {
+    n:"03 / GUIDE",
+    title:"YOUR GUIDE CAN CHANGE.",
+    text:"Open ⚙ anytime. Changing the guide does not delete your existing data."
+  },
+  {
+    n:"04 / IMPORTANT",
+    title:"THIS SYSTEM DOES NOT DIAGNOSE YOU.",
+    text:"Brain Lab and Decode My Brain are reflective educational experiences, not medical or psychological assessments."
+  },
+  {
+    n:"05 / FINAL WARNING",
+    title:"CLICK EVERYTHING.",
+    text:"There are hidden things. Some are harmless. Some are weird. One of them may be watching the system."
+  }
+];
 
-    if(
-        monster.classList.contains("run")
-    ) return;
+function renderIntro(){
+  const s=introSteps[state.introIndex];
 
-    document.body.classList.add(
-        "screen-glitch"
+  $("introContent").innerHTML=`
+    <div class="intro-step">
+      <div class="intro-number">${s.n}</div>
+      <h2 class="intro-title">${s.title}</h2>
+      <p class="muted" style="line-height:1.8;max-width:600px">${s.text}</p>
+    </div>
+  `;
+
+  $("introBack").classList.toggle("hidden",state.introIndex===0);
+  $("introNext").classList.toggle(
+    "hidden",
+    state.introIndex===introSteps.length-1
+  );
+  $("introDone").classList.toggle(
+    "hidden",
+    state.introIndex!==introSteps.length-1
+  );
+}
+
+function openIntro(){
+  state.introIndex=0;
+  renderIntro();
+  $("introModal").classList.add("show");
+}
+
+$("introBtn").onclick=openIntro;
+
+$("introNext").onclick=()=>{
+  if(state.introIndex<introSteps.length-1){
+    state.introIndex++;
+    renderIntro();
+  }
+};
+
+$("introBack").onclick=()=>{
+  if(state.introIndex>0){
+    state.introIndex--;
+    renderIntro();
+  }
+};
+
+$("introDone").onclick=()=>{
+  safeSet(STORE.intro,true);
+  $("introModal").classList.remove("show");
+  guideSay("Initialization complete. Now go break the interface.");
+};
+
+/* =========================================================
+   GUIDE CHANGER
+   ========================================================= */
+
+function renderGuideSelector(){
+  $("guideSelectGrid").innerHTML=
+    Object.entries(GUIDES).map(([id,g])=>`
+      <button class="guide-option ${state.selectedGuide===id?"active":""}" data-guide-option="${id}">
+        <b>${g.icon}</b>
+        ${g.name}
+      </button>
+    `).join("");
+
+  $("guideNameInput").value=state.companionName||"";
+}
+
+$("changeGuideBtn").onclick=()=>{
+  state.selectedGuide=state.companion;
+  renderGuideSelector();
+  $("guideModal").classList.add("show");
+  unlock("guide");
+};
+
+$("closeGuide").onclick=()=>{
+  $("guideModal").classList.remove("show");
+};
+
+$("guideSelectGrid").addEventListener("click",e=>{
+  const button=e.target.closest("[data-guide-option]");
+  if(!button)return;
+
+  state.selectedGuide=button.dataset.guideOption;
+  renderGuideSelector();
+  playClickSound();
+});
+
+$("saveGuide").onclick=()=>{
+  const id=state.selectedGuide;
+
+  if(!GUIDES[id])return;
+
+  state.companion=id;
+
+  const custom=$("guideNameInput").value.trim();
+  state.companionName=custom;
+
+  safeSet(STORE.companion,state.companion);
+  safeSet(STORE.companionName,state.companionName);
+
+  updateCompanion();
+
+  $("guideModal").classList.remove("show");
+
+  toast(
+    GUIDES[id].icon+" "+(custom||GUIDES[id].name)+
+    " is now guiding your system."
+  );
+
+  playSuccessSound();
+
+  setTimeout(()=>{
+    playEntrySound(id);
+  },250);
+
+  state.entryPlayed=false;
+  setTimeout(()=>{
+    state.entryPlayed=false;
+    playEntrySound(id);
+  },300);
+
+  if(id==="aki")unlock("sword");
+};
+
+/* =========================================================
+   SOUND BUTTON
+   ========================================================= */
+
+function updateSoundButton(){
+  $("soundBtn").textContent=state.sound?"🔊":"🔇";
+}
+
+$("soundBtn").onclick=()=>{
+  state.sound=!state.sound;
+  safeSet(STORE.sound,state.sound);
+  updateSoundButton();
+
+  if(state.sound){
+    unlockAudio();
+    tone(520,.08,"triangle",.03);
+    toast("SOUND ENABLED");
+  }else{
+    toast("SOUND MUTED");
+  }
+};
+
+updateSoundButton();
+
+/* =========================================================
+   GLOBAL NAVIGATION
+   ========================================================= */
+
+document.querySelectorAll("[data-scroll]").forEach(button=>{
+  button.addEventListener("click",()=>{
+    const id=button.dataset.scroll;
+    const target=$(id);
+
+    if(target){
+      target.scrollIntoView({behavior:"smooth"});
+      activity("explore");
+      guideSay();
+    }
+  });
+});
+
+/* =========================================================
+   COMPANION INTERACTION
+   ========================================================= */
+
+companionBody.addEventListener("click",()=>{
+  unlockAudio();
+  playClickSound();
+  guideSay();
+  activity("curious");
+});
+
+let companionMoveTimer=null;
+
+document.addEventListener("mousemove",e=>{
+  if(window.innerWidth<700)return;
+
+  if(state.companion==="cat"){
+    const x=e.clientX/window.innerWidth;
+
+    if(x<.18){
+      companion.classList.add("walk-left");
+    }else if(x>.78){
+      companion.classList.remove("walk-left");
+    }
+  }
+});
+
+function companionContext(message){
+  guideSay(message);
+}
+
+/* =========================================================
+   DECODE MY BRAIN
+   ========================================================= */
+
+const decodeQuestions=[
+  {
+    q:"When you finally get free time, what happens first?",
+    options:[
+      ["I immediately start investigating something.","curious"],
+      ["My brain opens twelve unrelated tabs.","chaotic"],
+      ["I replay something that happened.","reflective"],
+      ["I imagine what could happen next.","future"]
+    ]
+  },
+  {
+    q:"A difficult problem appears. Your first instinct is...",
+    options:[
+      ["Break it into smaller pieces.","analytical"],
+      ["Walk away and let my brain process it.","reflective"],
+      ["Try the weirdest possible approach.","creative"],
+      ["Ask why the problem exists in the first place.","curious"]
+    ]
+  },
+  {
+    q:"Which rabbit hole is most dangerous to you?",
+    options:[
+      ["Science.","curious"],
+      ["People and why they behave like that.","reflective"],
+      ["Future technology.","future"],
+      ["Completely random facts.","chaotic"]
+    ]
+  },
+  {
+    q:"When something matters to you, you usually...",
+    options:[
+      ["Think about it repeatedly.","reflective"],
+      ["Research everything.","analytical"],
+      ["Imagine multiple futures.","future"],
+      ["Turn it into a project.","creative"]
+    ]
+  },
+  {
+    q:"What sounds most satisfying?",
+    options:[
+      ["Understanding something nobody explained properly.","curious"],
+      ["Making a complicated thing simple.","analytical"],
+      ["Creating something that did not exist.","creative"],
+      ["Discovering an unexpected connection.","chaotic"]
+    ]
+  },
+  {
+    q:"Final input. Your brain feels most like...",
+    options:[
+      ["A laboratory.","analytical"],
+      ["A library with secret rooms.","reflective"],
+      ["A spaceship with no destination.","future"],
+      ["A browser with 47 tabs.","chaotic"]
+    ]
+  }
+];
+
+function renderDecode(){
+  const q=decodeQuestions[state.decodeIndex];
+
+  $("decodeProgress").textContent=
+    String(state.decodeIndex+1).padStart(2,"0")+
+    " / "+
+    String(decodeQuestions.length).padStart(2,"0");
+
+  $("decodeQuestion").textContent=q.q;
+
+  $("decodeOptions").innerHTML=q.options.map((o,i)=>`
+    <button class="decode-option" data-decode="${i}">
+      ${o[0]}
+    </button>
+  `).join("");
+
+  $("decodeResult").classList.add("hidden");
+}
+
+$("decodeOptions").addEventListener("click",e=>{
+  const btn=e.target.closest("[data-decode]");
+  if(!btn)return;
+
+  const q=decodeQuestions[state.decodeIndex];
+  const answer=q.options[Number(btn.dataset.decode)];
+
+  state.decodeAnswers.push(answer[1]);
+  playClickSound();
+
+  if(state.decodeIndex<decodeQuestions.length-1){
+    state.decodeIndex++;
+    renderDecode();
+    activity("curious");
+  }else{
+    finishDecode();
+  }
+});
+
+function finishDecode(){
+  const counts={};
+
+  state.decodeAnswers.forEach(x=>{
+    counts[x]=(counts[x]||0)+1;
+  });
+
+  const winner=Object.entries(counts)
+    .sort((a,b)=>b[1]-a[1])[0][0];
+
+  const profiles={
+    curious:{
+      title:"THE INVESTIGATOR",
+      text:"You seem drawn toward unanswered questions and unexplored connections. Your curiosity appears to be one of the strongest signals in this session."
+    },
+    analytical:{
+      title:"THE CARTOGRAPHER",
+      text:"You tend to look for structure. When something feels complicated, you seem interested in finding the underlying system."
+    },
+    reflective:{
+      title:"THE OBSERVER",
+      text:"You appear to spend significant attention noticing patterns in experiences, memories and meaning."
+    },
+    creative:{
+      title:"THE BUILDER",
+      text:"Your answers point toward making, remixing and turning abstract ideas into something tangible."
+    },
+    future:{
+      title:"THE PROJECTOR",
+      text:"You seem naturally interested in possibilities, outcomes and versions of things that have not happened yet."
+    },
+    chaotic:{
+      title:"THE CONNECTION ENGINE",
+      text:"Your thinking seems comfortable jumping between unrelated ideas and finding unexpected connections."
+    }
+  };
+
+  const p=profiles[winner];
+
+  $("decodeResult").innerHTML=`
+    <strong style="font-size:1.4rem">${p.title}</strong>
+    <p>${p.text}</p>
+    <div class="muted small">
+      Reflective pattern only — not a diagnosis.
+    </div>
+  `;
+
+  $("decodeResult").classList.remove("hidden");
+
+  unlock("decode");
+  activity("reflect");
+  playSuccessSound();
+  guideSay("Decode complete. Interesting pattern.");
+}
+
+$("decodeReset").onclick=()=>{
+  state.decodeIndex=0;
+  state.decodeAnswers=[];
+  renderDecode();
+};
+
+renderDecode();
+
+/* =========================================================
+   BRAIN LAB
+   ========================================================= */
+
+const brainData={
+  pfc:{
+    title:"Prefrontal systems",
+    text:"Broadly involved in planning, attention, decision-making and cognitive control. These functions work with many other brain systems rather than operating alone."
+  },
+  dmn:{
+    title:"Default mode network",
+    text:"A network associated with internally focused thought, remembering, imagining and thinking about yourself and other people. It interacts with other networks depending on what you are doing."
+  },
+  amygdala:{
+    title:"Amygdala",
+    text:"Part of a larger set of systems involved in emotional processing and evaluating the relevance of information, especially when something feels important or potentially significant."
+  },
+  hippocampus:{
+    title:"Hippocampus",
+    text:"A structure strongly involved in forming and organizing memories and supporting learning. Memory is a distributed process, so the hippocampus is only one part of the picture."
+  },
+  future:{
+    title:"Future-oriented thought",
+    text:"Imagining future possibilities draws on multiple interacting systems involved in memory, imagination, planning and evaluation."
+  },
+  all:{
+    title:"Whole system",
+    text:"The brain is not a collection of isolated boxes. Different networks and regions interact continuously depending on the task, context and information being processed."
+  }
+};
+
+function openBrainLab(){
+  document.body.classList.add("brain-open");
+  setBrain("all");
+  activity("explore");
+  unlock("brain");
+  unlockAudio();
+  tone(180,.08,"sine",.025);
+  setTimeout(()=>tone(320,.1,"sine",.02),90);
+  guideSay("Brain Lab online.");
+}
+
+function closeBrainLab(){
+  document.body.classList.remove("brain-open");
+}
+
+function setBrain(id){
+  const data=brainData[id]||brainData.all;
+
+  $("brainMode").textContent=data.title.toUpperCase();
+  $("brainRegionTitle").textContent=data.title;
+  $("brainRegionText").textContent=data.text;
+
+  document.querySelectorAll("[data-brain]").forEach(btn=>{
+    btn.style.color=
+      btn.dataset.brain===id ? "white" : "";
+  });
+}
+
+$("openBrain").onclick=openBrainLab;
+$("closeBrain").onclick=closeBrainLab;
+
+document.querySelectorAll("[data-brain]").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    setBrain(btn.dataset.brain);
+    playClickSound();
+    activity("curious");
+    guideSay();
+  });
+});
+
+/* =========================================================
+   RABBIT HOLE
+   ========================================================= */
+
+const rabbitQuestions=[
+  "If memory changes every time we remember something, what exactly are we preserving?",
+  "Why does curiosity feel like an itch that thinking can scratch?",
+  "If nobody saw an achievement, would it still change how you see yourself?",
+  "How much of your personality is made from things you repeatedly do?",
+  "Why can one sentence from years ago suddenly become important today?",
+  "If technology could perfectly predict your choices, would your choices feel different?",
+  "What makes a place feel like home?",
+  "Why do humans turn experiences into stories?",
+  "Can something be meaningful even if it has no measurable result?",
+  "What would you investigate if nobody could judge the question?"
+];
+
+function renderRabbit(){
+  const index=(state.rabbitDepth-1)%rabbitQuestions.length;
+
+  $("rabbitDepth").textContent=
+    String(state.rabbitDepth).padStart(2,"0");
+
+  $("rabbitPrompt").textContent=rabbitQuestions[index];
+}
+
+$("rabbitNext").onclick=()=>{
+  state.rabbitDepth++;
+
+  if(state.rabbitDepth>=5){
+    unlock("rabbit");
+  }
+
+  activity("curious");
+  renderRabbit();
+  playClickSound();
+  guideSay("Going deeper.");
+};
+
+$("rabbitRandom").onclick=()=>{
+  const current=$("rabbitPrompt").textContent;
+  let next=current;
+
+  while(next===current){
+    next=rabbitQuestions[
+      Math.floor(Math.random()*rabbitQuestions.length)
+    ];
+  }
+
+  $("rabbitPrompt").textContent=next;
+
+  activity("curious");
+  playClickSound();
+  guideSay();
+};
+
+renderRabbit();
+
+/* =========================================================
+   FUTURE ME
+   ========================================================= */
+
+function renderFuture(){
+  const list=state.future||[];
+
+  if(!list.length){
+    $("futureArchive").innerHTML=
+      `<div class="muted small">No transmissions stored.</div>`;
+    return;
+  }
+
+  $("futureArchive").innerHTML=list
+    .slice()
+    .reverse()
+    .map((item,index)=>`
+      <div class="archive-item">
+        <div class="archive-date">
+          TRANSMISSION ${list.length-index}
+          · ${new Date(item.created).toLocaleDateString()}
+        </div>
+        <strong>OPEN ${new Date(item.openAt).toLocaleDateString()}</strong>
+        <p>${escapeHTML(item.text)}</p>
+      </div>
+    `).join("");
+}
+
+$("futureText").addEventListener("input",()=>{
+  safeSet(
+    STORE.draft,
+    Object.assign(
+      {},
+      safeGet(STORE.draft,{}),
+      {future:$("futureText").value}
+    )
+  );
+});
+
+$("saveFuture").onclick=()=>{
+  const text=$("futureText").value.trim();
+
+  if(!text){
+    toast("NOTHING TO STORE.");
+    return;
+  }
+
+  const days=Number($("futureWhen").value)||30;
+
+  const item={
+    text,
+    created:Date.now(),
+    openAt:Date.now()+days*86400000
+  };
+
+  state.future.push(item);
+  safeSet(STORE.future,state.future);
+
+  state.stats.archives++;
+  saveStats();
+
+  $("futureText").value="";
+  renderFuture();
+  updateStats();
+
+  unlock("future");
+  activity("reflect");
+  playSuccessSound();
+
+  toast("TIME CAPSULE STORED.");
+};
+
+/* =========================================================
+   LETTERS
+   ========================================================= */
+
+function renderLetters(){
+  const list=state.letters||[];
+
+  if(!list.length){
+    $("letterArchive").innerHTML=
+      `<div class="muted small">No unsent letters archived.</div>`;
+    return;
+  }
+
+  $("letterArchive").innerHTML=list
+    .slice()
+    .reverse()
+    .map((item,index)=>`
+      <div class="archive-item">
+        <div class="archive-date">
+          LETTER ${list.length-index}
+          · ${new Date(item.created).toLocaleDateString()}
+        </div>
+        <strong>TO: ${escapeHTML(item.to||"NOBODY")}</strong>
+        <p>${escapeHTML(item.text)}</p>
+      </div>
+    `).join("");
+}
+
+$("letterText").addEventListener("input",()=>{
+  const d=safeGet(STORE.draft,{});
+
+  d.letter=$("letterText").value;
+  d.letterTo=$("letterTo").value;
+
+  safeSet(STORE.draft,d);
+});
+
+$("letterTo").addEventListener("input",()=>{
+  const d=safeGet(STORE.draft,{});
+
+  d.letter=$("letterText").value;
+  d.letterTo=$("letterTo").value;
+
+  safeSet(STORE.draft,d);
+});
+
+$("saveLetter").onclick=()=>{
+  const text=$("letterText").value.trim();
+
+  if(!text){
+    toast("THE LETTER IS EMPTY.");
+    return;
+  }
+
+  state.letters.push({
+    to:$("letterTo").value.trim(),
+    text,
+    created:Date.now()
+  });
+
+  safeSet(STORE.letters,state.letters);
+
+  state.stats.archives++;
+  saveStats();
+
+  $("letterText").value="";
+  $("letterTo").value="";
+
+  renderLetters();
+  updateStats();
+
+  unlock("letter");
+  activity("reflect");
+  playSuccessSound();
+
+  toast("LETTER ARCHIVED. NEVER SENT.");
+};
+
+$("clearLetter").onclick=()=>{
+  $("letterText").value="";
+  $("letterTo").value="";
+};
+
+/* =========================================================
+   DRAFT RECOVERY
+   ========================================================= */
+
+function loadDrafts(){
+  const d=safeGet(STORE.draft,{});
+
+  if(d.future){
+    $("futureText").value=d.future;
+  }
+
+  if(d.letter){
+    $("letterText").value=d.letter;
+  }
+
+  if(d.letterTo){
+    $("letterTo").value=d.letterTo;
+  }
+
+  if(d.parent){
+    $("parentInput").value=d.parent;
+  }
+}
+
+/* =========================================================
+   PARENT.EXE
+   ========================================================= */
+
+function generateParentResponse(input,draft=false){
+  const clean=input.trim();
+
+  if(!clean){
+    return "There is no message yet. Type what you are trying to explain first.";
+  }
+
+  if(draft){
+    return `I want to explain something instead of keeping it in my head.
+
+${clean}
+
+I am not necessarily asking you to solve it immediately. I just want you to understand what is going on from my side. I would rather talk about it properly than let it become a misunderstanding.`;
+  }
+
+  return `If I were trying to understand this message, I would probably start by asking:
+
+"What part of this matters most to you?"
+
+You do not have to explain everything perfectly in one attempt. Start with the part that feels easiest to say, then build from there.
+
+LOCAL SIMULATION — no message has been sent.`;
+}
+
+$("parentInput").addEventListener("input",()=>{
+  const d=safeGet(STORE.draft,{});
+  d.parent=$("parentInput").value;
+  safeSet(STORE.draft,d);
+});
+
+$("parentGenerate").onclick=()=>{
+  const input=$("parentInput").value;
+
+  $("parentMessage").textContent=input;
+  $("parentMessage").classList.remove("hidden");
+
+  $("parentResponse").textContent=
+    generateParentResponse(input,false);
+
+  activity("reflect");
+  playSuccessSound();
+  guideSay("Communication protocol generated.");
+};
+
+$("parentDraft").onclick=()=>{
+  const input=$("parentInput").value;
+
+  $("parentMessage").textContent=input;
+  $("parentMessage").classList.remove("hidden");
+
+  $("parentResponse").textContent=
+    generateParentResponse(input,true);
+
+  activity("reflect");
+  playSuccessSound();
+};
+
+$("parentNew").onclick=()=>{
+  $("parentInput").value="";
+  $("parentMessage").textContent="";
+  $("parentMessage").classList.add("hidden");
+  $("parentResponse").textContent=
+    "No response generated yet.";
+};
+
+/* =========================================================
+   CHAOS CONSOLE
+   ========================================================= */
+
+$("chaosGuide").onclick=()=>{
+  guideSay();
+  playClickSound();
+};
+
+$("chaosGlitch").onclick=()=>{
+  document.body.classList.add("screen-glitch");
+
+  setTimeout(()=>{
+    document.body.classList.remove("screen-glitch");
+  },400);
+
+  activity("curious");
+  tone(90,.08,"square",.025);
+  setTimeout(()=>tone(160,.07,"square",.018),90);
+
+  toast("REALITY.EXE HAS BEEN TEMPORARILY QUESTIONED.");
+};
+
+let unknownCount=0;
+
+$("chaosSecret").onclick=()=>{
+  unknownCount++;
+
+  if(unknownCount<3){
+    alertSystem(
+      "UNKNOWN PROCESS",
+      "Nothing happened. Probably."
     );
-
-    playMonsterScream();
-
-    showSystemAlert(
-        "UNKNOWN PROCESS ESCAPED CONTAINMENT."
+  }else{
+    alertSystem(
+      "PROCESS DETECTED",
+      "A hidden process noticed that you kept looking."
     );
-
-    monster.classList.add("run");
-
-    state.stats.hiddenEvents++;
-
-    saveStats();
 
     unlock("unknown");
-    unlock("anomaly");
+  }
 
-    companionSay(
-        companionLines("monster"),
-        5000
-    );
+  playClickSound();
+};
 
-    setTimeout(()=>{
+$("chaosMonster").onclick=()=>{
+  runMonster();
+};
 
-        monster.classList.remove("run");
+/* =========================================================
+   MONSTER
+   ========================================================= */
 
-        document.body.classList.remove(
-            "screen-glitch"
-        );
+let monsterRunning=false;
 
-    },1700);
+function runMonster(){
+  if(monsterRunning)return;
 
+  monsterRunning=true;
+
+  const monster=$("monster");
+
+  monster.classList.remove("run");
+  void monster.offsetWidth;
+  monster.classList.add("run");
+
+  document.body.classList.add("screen-glitch");
+
+  alertSystem(
+    "CONTAINMENT BREACH",
+    "UNKNOWN PROCESS crossed the interface."
+  );
+
+  playMonsterSound();
+
+  setTimeout(()=>{
+    document.body.classList.remove("screen-glitch");
+  },450);
+
+  setTimeout(()=>{
+    monster.classList.remove("run");
+    monsterRunning=false;
+  },1500);
+
+  unlock("unknown");
+
+  guideSay(
+    "Okay. That definitely was not supposed to happen."
+  );
 }
 
 /* =========================================================
-   TERMINAL
+   KEYBOARD EASTER EGGS
    ========================================================= */
 
-function openTerminal(){
+let keyBuffer="";
 
-    document
-        .getElementById("terminal")
-        .classList.add("open");
+document.addEventListener("keydown",e=>{
+  if(e.key.length!==1)return;
 
-    setTimeout(()=>{
+  keyBuffer+=e.key.toLowerCase();
 
-        document
-            .getElementById("terminalInput")
-            .focus();
+  if(keyBuffer.length>20){
+    keyBuffer=keyBuffer.slice(-20);
+  }
 
-    },100);
+  if(keyBuffer.includes("chaos")){
+    keyBuffer="";
+    toast("CHAOS DETECTED.");
+    guideSay();
+  }
 
-}
-
-function closeTerminal(){
-
-    document
-        .getElementById("terminal")
-        .classList.remove("open");
-
-}
-
-document
-.getElementById("terminalInput")
-.addEventListener(
-    "keydown",
-    e=>{
-
-        if(e.key==="Enter"){
-
-            const command=
-                e.target.value
-                .trim()
-                .toUpperCase();
-
-            runCommand(command);
-
-            e.target.value="";
-
-        }
-
-    }
-);
-
-function terminalWrite(text){
-
-    const out=
-        document.getElementById("terminalOutput");
-
-    out.textContent +=
-        "\n\n> "+text;
-
-    out.scrollTop=
-        out.scrollHeight;
-
-}
-
-function runCommand(command){
-
-    const commands={
-
-        HELP:
-`COMMANDS:
-HELP
-STATUS
-WHOAMI
-BRAIN
-CAT
-ROBOT
-VOID
-AKI
-RABBIT
-UNKNOWN
-CLEAR
-EXIT`,
-
-        STATUS:
-`STUDENT_OS ONLINE
-LOCAL MEMORY ACTIVE
-COMPANION: ${state.companion.toUpperCase()}
-UNKNOWN PROCESS: [REDACTED]`,
-
-        WHOAMI:
-`SUBJECT: YOU
-CREATOR: [REDACTED]
-STATUS: STILL LOOKING.`,
-
-        BRAIN:
-"Use the Brain Lab. Stop trying to inspect your brain through a terminal.",
-
-        CAT:
-"CAT.exe says: meow.",
-
-        ROBOT:
-"ROBOT.exe says: command acknowledged unnecessarily.",
-
-        VOID:
-"VOID.exe says: ...",
-
-        AKI:
-"AKI.exe says: SIDE QUEST?",
-
-        RABBIT:
-`CURRENT DEPTH: ${state.rabbitDepth}`,
-
-        UNKNOWN:
-"ACCESS DENIED."
-    };
-
-    if(command==="CLEAR"){
-
-        document
-            .getElementById("terminalOutput")
-            .textContent="";
-
-        return;
-    }
-
-    if(command==="EXIT"){
-
-        closeTerminal();
-        return;
-    }
-
-    if(command==="CAT"){
-
-        if(state.sound){
-            playMeow();
-        }
-
-    }
-
-    if(command==="UNKNOWN"){
-
-        if(Math.random()<.45){
-
-            setTimeout(
-                triggerMonster,
-                500
-            );
-
-        }else{
-
-            showSystemAlert(
-                "unknown_process is watching."
-            );
-
-        }
-
-    }
-
-    terminalWrite(
-        commands[command] ||
-        `COMMAND NOT FOUND: ${command}`
+  if(keyBuffer.includes("void")){
+    keyBuffer="";
+    alertSystem(
+      "VOID SIGNAL",
+      "Something quiet just noticed you."
     );
+  }
+});
 
+/* =========================================================
+   RANDOM MISSIONS
+   ========================================================= */
+
+const missions=[
+  "Open a system you have never opened.",
+  "Write one sentence you normally would not say aloud.",
+  "Go three levels deeper in the Rabbit Hole.",
+  "Ask the Brain Lab a question.",
+  "Leave future-you a transmission.",
+  "Change your guide and see what changes.",
+  "Find the suspicious button.",
+  "Decode your brain without overthinking it."
+];
+
+function updateMission(){
+  $("nextMission").textContent=
+    missions[Math.floor(Math.random()*missions.length)];
+}
+
+updateMission();
+
+/* =========================================================
+   ESCAPE HANDLING
+   ========================================================= */
+
+document.addEventListener("keydown",e=>{
+  if(e.key!=="Escape")return;
+
+  if(document.body.classList.contains("brain-open")){
+    closeBrainLab();
+  }
+
+  $("introModal").classList.remove("show");
+  $("guideModal").classList.remove("show");
+});
+
+/* =========================================================
+   HTML ESCAPE
+   ========================================================= */
+
+function escapeHTML(value){
+  return String(value??"")
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
 }
 
 /* =========================================================
-   GLOBAL CHAOS
+   AUTO SAVE STATS / UI
    ========================================================= */
 
-document.addEventListener(
-    "click",
-    e=>{
+window.addEventListener("beforeunload",()=>{
+  saveStats();
+  safeSet(STORE.companion,state.companion);
+  safeSet(STORE.companionName,state.companionName);
+  safeSet(STORE.sound,state.sound);
+});
 
-        if(
-            e.target.closest("button")
-        ){
-            playClick();
-        }
-
-    }
-);
-
-/* secret key */
-
-let unknownTyped="";
-
-document.addEventListener(
-    "keydown",
-    e=>{
-
-        if(
-            !e.target.matches(
-                "input,textarea"
-            )
-        ){
-
-            unknownTyped +=
-                e.key.toUpperCase();
-
-            unknownTyped=
-                unknownTyped.slice(-7);
-
-            if(
-                unknownTyped==="UNKNOWN"
-            ){
-
-                showSystemAlert(
-                    "WHY DID YOU TYPE THAT?"
-                );
-
-                unlock("unknown");
-
-                state.stats.hiddenEvents++;
-
-                saveStats();
-
-            }
-
-        }
-
-        if(
-            e.key==="Escape"
-        ){
-
-            if(
-                document.body
-                .classList
-                .contains("brain-open")
-            ){
-                closeBrainLab();
-            }
-
-            closeTerminal();
-
-        }
-
-    }
-);
+setInterval(()=>{
+  saveStats();
+},10000);
 
 /* =========================================================
-   UTILITIES
+   INITIAL RENDER
    ========================================================= */
 
-function escapeHTML(str=""){
+renderAchievements();
+updateStats();
+updateCompanion();
+bootSequence();
 
-    return str.replace(
-        /[&<>"']/g,
-        char=>({
-            "&":"&amp;",
-            "<":"&lt;",
-            ">":"&gt;",
-            '"':"&quot;",
-            "'":"&#039;"
-        })[char]
-    );
-
-}
-
-function toast(text){
-
-    const t=
-        document.getElementById("toast");
-
-    t.textContent=text;
-
-    t.classList.add("show");
-
-    clearTimeout(
-        toast.timer
-    );
-
-    toast.timer=
-        setTimeout(()=>{
-            t.classList.remove("show");
-        },3000);
-
-}
-
-/* sound icon initial state */
-
-document
-.getElementById("soundIcon")
-.textContent=
-state.sound
-? "🔊"
-: "🔇";
-
-/* initialize rabbit visual */
-
-if(state.rabbitDepth>0){
-
-    document
-        .getElementById("rabbitDepth")
-        .textContent=
-        "DEPTH // "+
-        String(state.rabbitDepth)
-        .padStart(2,"0");
-
-}
+})();
 </script>
 
 </body>
